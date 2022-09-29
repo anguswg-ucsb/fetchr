@@ -1,5 +1,5 @@
 Package: fetchr
-Title: Calculate fetch distance values from raster data 
+Title: fetchr
 Version: 0.0.0.9000
 Authors@R: 
     person("Angus", "Watters", , "anguswatters@gmail.com", role = c("aut", "cre"))
@@ -10,9 +10,13 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports:
-    magrittr,
     stats,
     dplyr,
     parallel,
     terra, 
-    tidyr
+    tidyr,
+    raster,
+    sf
+Depends: 
+    R (>= 2.10)
+LazyData: true

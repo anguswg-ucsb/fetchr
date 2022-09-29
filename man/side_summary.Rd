@@ -10,7 +10,6 @@ side_summary(
   cell_res = 2000,
   max_dist = 1e+05,
   func = "mean",
-  cell_count = NULL,
   ncores = 2,
   verbose = FALSE
 )

@@ -9,6 +9,8 @@ check_length(vect, max_count, verbose = FALSE)
 \arguments{
 \item{vect}{numeric vector of 1s and 0s (can include NAs)}
 
+\item{max_count}{numeric, indicating max number of pixels to count within maximum distance}
+
 \item{verbose}{logical, whether messages should be printed. Default is FALSE, no messages print.}
 }
 \value{

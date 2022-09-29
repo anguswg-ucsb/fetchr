@@ -316,14 +316,13 @@ diag_summary <- function(
 #' @param verbose logical, whether to print messages or not. Default is FALSE.
 #'
 #' @return returns a list of summarized side lengths for every water cell, the same length as the number of rows in the input indices_df dataframe
-#' @importFrom parallel detectCores makeCluster clusterExport clusterEvalQ parLapply stopCluster
+#' @importFrom parallel detectCores makeCluster clusterExport parLapply stopCluster
 side_summary <- function(
     m,
     indices_df,
     cell_res   = 2000,
     max_dist   = 100000,
     func       = "mean",
-    cell_count = NULL,
     ncores     = 2,
     verbose    = FALSE
 ) {
@@ -919,6 +918,7 @@ check_rows <- function(m,
 
 #' Check length of consecutive non-zero cells in vector
 #' @param vect numeric vector of 1s and 0s (can include NAs)
+#' @param max_count numeric, indicating max number of pixels to count within maximum distance
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
 #' @return Count of consecutive non-zero cells from a matrix cell, extending out in a given direction
 check_length <- function(
@@ -1053,6 +1053,7 @@ check_zeros <- function(rle_vect, verbose = FALSE) {
 #' @param verbose logical, whether to print messages to console. Default is FALSE, no messages print
 #'
 #' @return numeric indicating the average cell count in all directions or a dataframe with consequetive cell counts (non-zero cells) up/down/left/right of the specified cell in a matrix
+#' @importFrom stats na.omit
 side_count <- function(
     m,
     row_index = NULL,
