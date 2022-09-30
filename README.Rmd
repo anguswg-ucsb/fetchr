@@ -101,5 +101,10 @@ system.time(
 plot(fetch)
 ```
 
-We can rasterize this land polygon and create a binary raster with land cell values of 1 and water cell values of 0.
+In this example here, calculating fetch distances for > 24,000 water cells took about ~12 seconds.
+
+
+
+
+
 

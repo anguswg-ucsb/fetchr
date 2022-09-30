@@ -103,16 +103,14 @@ system.time(
 )
 #> Calculating Fetch...
 #> Calculating North/South/East/West distances
-#> Initializing parallel processing:
-#> Cores: 12
 #> Calculating diagonal distances
 #>    user  system elapsed 
-#>   13.64    0.26   30.45
+#>    4.52    0.28   19.59
 
 plot(fetch)
 ```
 
 <img src="man/figures/README-fetch_calc-1.png" width="100%" />
 
-We can rasterize this land polygon and create a binary raster with land
-cell values of 1 and water cell values of 0.
+In this example here, calculating fetch distances for \> 24,000 water
+cells took about \~12 seconds.
