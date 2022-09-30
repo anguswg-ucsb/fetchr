@@ -5,7 +5,7 @@
 \alias{landwater}
 \title{Binary landwater raster}
 \format{
-An object of class \code{RasterLayer} of dimension 157 x 172 x 1.
+An object of class \code{RasterLayer} of dimension 189 x 183 x 1.
 }
 \usage{
 landwater

@@ -14,7 +14,8 @@ st <-
   terra::project("epsg:5070")
 
 # # Socal/Santa Barbara bounding box extent to crop to
-bb <- terra::ext(c(-2317958.20937478, -1973298.78204874, 1309390.77983874, 1623941.40966438))
+bb <- terra::ext(c(-2338958.20937478, -1973298.78204874, 1245390.77983874, 1623941.40966438))
+# bb <- terra::ext(c(-2317958.20937478, -1973298.78204874, 1309390.77983874, 1623941.40966438))
 
 # Template raster of HSI grid
 r_grid <- terra::rast(
@@ -36,7 +37,6 @@ landwater <- terra::setValues(
     r, ifelse(is.na(terra::values(r)), 1, 0)
   ) %>%
   raster::raster()
-
 
 usethis::use_data(landwater, overwrite = TRUE)
 
