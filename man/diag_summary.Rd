@@ -4,7 +4,14 @@
 \alias{diag_summary}
 \title{Summarize lengths of sequential raster cells diagonals}
 \usage{
-diag_summary(m, indices_df, func = "mean", max_count, verbose = FALSE)
+diag_summary(
+  m,
+  indices_df,
+  func = "mean",
+  max_count,
+  ncores = 2,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{m}{matrix of interest}
@@ -14,6 +21,8 @@ diag_summary(m, indices_df, func = "mean", max_count, verbose = FALSE)
 \item{func}{character R function to summarize surrounding vertical/horizontal pixels. One of "mean", "min", "max", or "sum". Default is "mean"}
 
 \item{max_count}{numeric, maximum cell count. Equal to maximum distance/cell resolution}
+
+\item{ncores}{numeric, number of cores to use for parallel processing. Default is 2.}
 
 \item{verbose}{logical, whether to print messages or not. Default is FALSE.}
 }

@@ -4,17 +4,7 @@
 \alias{diag_dist}
 \title{Retrieve length of any diagonal direction for a specific matrix cell}
 \usage{
-diag_dist(
-  m,
-  row_index = NULL,
-  col_index = NULL,
-  vdirect = "down",
-  hdirect = "right",
-  max_count,
-  as_matrix = FALSE,
-  id_col = FALSE,
-  verbose = FALSE
-)
+diag_dist(m, row_index = NULL, col_index = NULL, max_count, verbose = FALSE)
 }
 \arguments{
 \item{m}{matrix of interest}
@@ -23,15 +13,7 @@ diag_dist(
 
 \item{col_index}{numeric column number of matrix cell to get indices of diagonals for}
 
-\item{vdirect}{character indicating vertical direction for diagonal. Either "up" or "down". Default is "down".}
-
-\item{hdirect}{character indicating horizontal direction for diagonal. Either "left" or "right". Default is "right".}
-
 \item{max_count}{numeric, maximum number of cells within max_dist}
-
-\item{as_matrix}{logical. Whether a matrix with row/column/cell_count/direction is returned or a numeric vector. Default is FALSE, returns a numeric vector of cell counts}
-
-\item{id_col}{logical. Whether a column stating the direction of the diagonal should be included. Default is FALSE, no direction column is added.}
 
 \item{verbose}{logical. Whether messages should output to console. Default is FALSE, no messages output.}
 }
