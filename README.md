@@ -4,67 +4,115 @@
 # fetchr
 
 <!-- badges: start -->
+
+[![Dependencies](https://img.shields.io/badge/dependencies-9/07-orange?style=flat)](#)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://choosealicense.com/licenses/mit/)
 <!-- badges: end -->
 
-Calculating fetch lengths, the distance that wind can blow in a constant
-direction over a body of water without interruption, can be a slow and
-memory intensive process when done on thousands of points of interest in
-multiple directions. The goal of `fetchr` is to provide a fast and
-efficient raster based method for calculating fetch lengths across
-thousands of water grid cells.
+<div align="left">
+
+<p align="left">
+<a href="https://en.wikipedia.org/wiki/Wind_fetch"><strong>« Fetch
+»</strong></a> <br />
+</p>
+
+</div>
+
+<hr>
+
+The goal of `fetchr` is to provide a fast and efficient raster based
+method for calculating fetch lengths across thousands of water grid
+cells. Calculating fetch lengths, the distance that wind can blow in a
+constant direction over a body of water without interruption, can be a
+slow and memory intensive process when done on thousands of points of
+interest in multiple directions. `fetchr` attempts to fix this problem
+and allows for thousands of fetch calculations to be performed in a
+fraction of the time that other methods take.
+
+<hr>
 
 ## Installation
 
-You can install the development version of fetchr from
-[GitHub](https://github.com/) with:
+You can install the development version of `fetchr` from
+[GitHub](https://github.com/anguswg-ucsb/fetchr) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("anguswg-ucsb/fetchr")
 ```
 
-## Example
+## Coastline raster
 
-If we start with a polygon that represents the Southern California coast
+If we start with a raster representing the Southern California coast
 near Santa Barbara, CA.
 
 ``` r
 library(fetchr)
 
-land_poly <- terra::vect(fetchr::land_vect)
-terra::plot(land_poly, col = "darkgreen")
+# land raster
+land_rast <- terra::rast(fetchr::land)
+
+terra::plot(land_rast, col = "#2e8b57")
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />
 
-We can rasterize this land polygon and create a binary raster with land
-cell values of 1 and water cell values of 0. What is special about using
-`README.Rmd` instead of just `README.md`? You can include R chunks like
-so:
+<br>
+
+## Make a binary land water rasters
+
+We can take this land raster, indicate which cells are water cells, and
+create a binary land water raster (land = 0, water = 1).
 
 ``` r
+# binary land water raster 
 landwater <- fetchr::get_landwater(
-  r           = land_poly,
-  water_value = NA,
-  res         = 2000
+  r           = land_rast,                 # land raster
+  water_value = NA,                        # cells with a value of NA are classified as water, all other cells are land
+  res         = terra::res(land_rast)[1]   # return raster with the same cell resolution as input raster
   )
-#> Rasterizing SpatVect...
-#> Resolution: 2000 x 2000
+#> SpatRaster provided...
 
-terra::plot(landwater)
+terra::plot(landwater, col = c("#2e8b57", "#add8e6"))
 ```
 
 <img src="man/figures/README-binary_lw-1.png" width="100%" />
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
+This raster now meets all the specification for using `get_fetch()`: -
+Binary cell values (land cells = 0 and water cells = 1) - Projected
+Coordinate Reference System - Regular grid cell size (same x and y cell
+resolution)
 
-You can also embed plots, for example:
+<br>
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+## Calculate fetch length
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+Now let’s calculate our fetch length raster
+
+``` r
+system.time(
+  
+  fetch <- fetchr::get_fetch(
+    r        = landwater,     # binary land water raster
+    max_dist = 200000,        # maximum distance to calculate fetch in meters (200km)
+    ncores   = 12,            # number of computer cores to use 
+    verbose  = TRUE
+    )
+  
+)
+#> Calculating Fetch...
+#> Calculating North/South/East/West distances
+#> Initializing parallel processing:
+#> Cores: 12
+#> Calculating diagonal distances
+#>    user  system elapsed 
+#>   13.64    0.26   30.45
+
+plot(fetch)
+```
+
+<img src="man/figures/README-fetch_calc-1.png" width="100%" />
+
+We can rasterize this land polygon and create a binary raster with land
+cell values of 1 and water cell values of 0.
