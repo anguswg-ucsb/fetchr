@@ -17,7 +17,7 @@ library(terra)
 library(sf)
 ```
 
-# fetchr
+# fetchr <img src="man/figures/fetchr_logo.png" align="right" width="25%" />
 
 <!-- badges: start -->
 [![Dependencies](https://img.shields.io/badge/dependencies-9/07-orange?style=flat)](#)

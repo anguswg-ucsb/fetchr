@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# fetchr
+# fetchr <img src="man/figures/fetchr_logo.png" align="right" width="25%" />
 
 <!-- badges: start -->
 
@@ -105,7 +105,7 @@ system.time(
 #> Calculating North/South/East/West distances
 #> Calculating diagonal distances
 #>    user  system elapsed 
-#>    4.52    0.28   19.59
+#>    4.62    0.30   18.89
 
 plot(fetch)
 ```
