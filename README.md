@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# fetchr <img src="man/figures/fetchr_logo.png" align="right" width="25%" />
+# fetchr <img src="man/figures/fetchr_logo_transparent.png" align="right" width="25%" />
 
 <!-- badges: start -->
 
@@ -79,10 +79,11 @@ terra::plot(landwater, col = c("#2e8b57", "#add8e6"))
 
 <img src="man/figures/README-binary_lw-1.png" width="100%" />
 
-This raster now meets all the specification for using `get_fetch()`: -
-Binary cell values (land cells = 0 and water cells = 1) - Projected
-Coordinate Reference System - Regular grid cell size (same x and y cell
-resolution)
+This raster now meets all the specification for using `get_fetch()`:
+
+-   Binary cell values (land cells = 0 and water cells = 1)
+-   Projected Coordinate Reference System
+-   Regular grid cell size (same x and y cell resolution)
 
 <br>
 
@@ -105,7 +106,7 @@ system.time(
 #> Calculating North/South/East/West distances
 #> Calculating diagonal distances
 #>    user  system elapsed 
-#>    4.62    0.30   18.89
+#>    4.80    0.15   20.85
 
 plot(fetch)
 ```
@@ -113,4 +114,6 @@ plot(fetch)
 <img src="man/figures/README-fetch_calc-1.png" width="100%" />
 
 In this example here, calculating fetch distances for \> 24,000 water
-cells took about \~12 seconds.
+cells took about \~20 seconds, or \~0.00083 seconds per point. That is a
+\~ 99.92% reduction in computation time compared to various other
+polygon based methods out there!

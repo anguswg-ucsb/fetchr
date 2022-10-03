@@ -17,7 +17,7 @@ library(terra)
 library(sf)
 ```
 
-# fetchr <img src="man/figures/fetchr_logo.png" align="right" width="25%" />
+# fetchr <img src="man/figures/fetchr_logo_transparent.png" align="right" width="25%" />
 
 <!-- badges: start -->
 [![Dependencies](https://img.shields.io/badge/dependencies-9/07-orange?style=flat)](#)
@@ -77,9 +77,10 @@ terra::plot(landwater, col = c("#2e8b57", "#add8e6"))
 ```
 
 This raster now meets all the specification for using `get_fetch()`:
-- Binary cell values (land cells = 0 and water cells = 1)
-- Projected Coordinate Reference System
-- Regular grid cell size (same x and y cell resolution)
+
+  - Binary cell values (land cells = 0 and water cells = 1)
+  - Projected Coordinate Reference System
+  - Regular grid cell size (same x and y cell resolution)
 
 <br>
 
@@ -101,8 +102,7 @@ system.time(
 plot(fetch)
 ```
 
-In this example here, calculating fetch distances for > 24,000 water cells took about ~12 seconds.
-
+In this example here, calculating fetch distances for > 24,000 water cells took about ~20 seconds, or ~0.00083 seconds per point. That is a  ~ 99.92% reduction in computation time compared to various other polygon based methods out there!
 
 
 
