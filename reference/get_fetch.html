@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">fetchr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.0000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.1000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,6 +96,55 @@
 <p>SpatRaster of mean, max, min, or total wind fetch distances from land calculated for every water pixel.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># mean fetch distance using a binary raster RasterLayer as the input</span></span></span>
+<span class="r-in"><span><span class="va">mean_fetch</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu">get_fetch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>r      <span class="op">=</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="va"><a href="landwater.html">landwater</a></span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># plot mean fetch</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mean_fetch</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># maximum fetch distance using a binary raster RasterLayer as the input</span></span></span>
+<span class="r-in"><span><span class="va">max_fetch</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu">get_fetch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>r      <span class="op">=</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="va"><a href="landwater.html">landwater</a></span>,</span></span>
+<span class="r-in"><span>func   <span class="op">=</span> <span class="st">"max"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot max fetch</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">max_fetch</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># minimum fetch distance using a binary raster RasterLayer as the input</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">min_fetch</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu">get_fetch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>r      <span class="op">=</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="va"><a href="landwater.html">landwater</a></span>,</span></span>
+<span class="r-in"><span>func   <span class="op">=</span> <span class="st">"min"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot min fetch</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">min_fetch</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># mean fetch distance using a sf MULTIPOLYGON object as the input</span></span></span>
+<span class="r-in"><span><span class="va">fetch_poly</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu">get_fetch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>r <span class="op">=</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="va"><a href="land_vect.html">land_vect</a></span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># plot mean fetch from a polygon object</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fetch_poly</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># increase the maximum distance to calculate fetch lengths out to 200km</span></span></span>
+<span class="r-in"><span><span class="va">increase_max_dist</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu">get_fetch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>r        <span class="op">=</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="va"><a href="landwater.html">landwater</a></span>,</span></span>
+<span class="r-in"><span>max_dist <span class="op">=</span> <span class="fl">200000</span>,</span></span>
+<span class="r-in"><span>ncores   <span class="op">=</span> <span class="fl">4</span>                      <span class="co"># increase the number of cores used on computer</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot mean fetch going out 200km</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">increase_max_dist</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
