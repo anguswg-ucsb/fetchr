@@ -1,3 +1,5 @@
+utils::globalVariables(c(".", "res", "cell_count", "diag_cell_count", "side_cell_count"))
+
 #' Retrieve length of any diagonal direction for a specific matrix cell
 #' @description Given a matrix and the row and column number for the cell of interest, return the number of consecutive non-zero values
 #' @param m matrix of interest
@@ -1619,8 +1621,54 @@ cell_dist <- function(
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
 #' @return SpatRaster of mean, max, min, or total wind fetch distances from land calculated for every water pixel.
 #' @importFrom dplyr `%>%` arrange group_by summarise left_join
-#' @importFrom terra as.matrix rast nrow ncol crs ext
+#' @importFrom terra as.matrix rast nrow ncol crs ext plot
 #' @export
+#' @examples
+#' \dontrun{
+#' # mean fetch distance using a binary raster RasterLayer as the input
+#' mean_fetch <- fetchr::get_fetch(
+#' r      = fetchr::landwater
+#' )
+#' # plot mean fetch
+#' plot(mean_fetch)
+#'
+#' # maximum fetch distance using a binary raster RasterLayer as the input
+#' max_fetch <- fetchr::get_fetch(
+#' r      = fetchr::landwater,
+#' func   = "max"
+#' )
+#'
+#' # plot max fetch
+#' plot(max_fetch)
+#'
+#' # minimum fetch distance using a binary raster RasterLayer as the input
+#'
+#' min_fetch <- fetchr::get_fetch(
+#' r      = fetchr::landwater,
+#' func   = "min"
+#' )
+#'
+#' # plot min fetch
+#'
+#' plot(min_fetch)
+#'
+#' # mean fetch distance using a sf MULTIPOLYGON object as the input
+#' fetch_poly <- fetchr::get_fetch(
+#' r = fetchr::land_vect
+#' )
+#' # plot mean fetch from a polygon object
+#' plot(fetch_poly)
+#'
+#' # increase the maximum distance to calculate fetch lengths out to 200km
+#' increase_max_dist <- fetchr::get_fetch(
+#' r        = fetchr::landwater,
+#' max_dist = 200000,
+#' ncores   = 4                      # increase the number of cores used on computer
+#' )
+#'
+#' # plot mean fetch going out 200km
+#' plot(increase_max_dist)
+#' }
 get_fetch = function(
     r              = NULL,
     max_dist       = 100000,

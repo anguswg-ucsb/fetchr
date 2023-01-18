@@ -35,3 +35,50 @@ SpatRaster of mean, max, min, or total wind fetch distances from land calculated
 \description{
 This function will calculate the mean, maximum, minimum, or total fetch distance in 8 directions (horizontally, vertically, and diagonally). When provided raster data, the default behavior is to treat all NA cells as water cells and all non NA cells as land. If you want to specify a different value for water cells, use the water_value argument to specify the grid cells that represent water. When a sf/terra polygon is provided, a cell resolution must be provided to specify the desired resolution of the output raster. Returns a binary landwater SpatRaster with land values of 0 and water values of 1.Returns a raster of the same CRS, resolution, and extent as the input raster or vector.
 }
+\examples{
+\dontrun{
+# mean fetch distance using a binary raster RasterLayer as the input
+mean_fetch <- fetchr::get_fetch(
+r      = fetchr::landwater
+)
+# plot mean fetch
+plot(mean_fetch)
+
+# maximum fetch distance using a binary raster RasterLayer as the input
+max_fetch <- fetchr::get_fetch(
+r      = fetchr::landwater,
+func   = "max"
+)
+
+# plot max fetch
+plot(max_fetch)
+
+# minimum fetch distance using a binary raster RasterLayer as the input
+
+min_fetch <- fetchr::get_fetch(
+r      = fetchr::landwater,
+func   = "min"
+)
+
+# plot min fetch
+
+plot(min_fetch)
+
+# mean fetch distance using a sf MULTIPOLYGON object as the input
+fetch_poly <- fetchr::get_fetch(
+r = fetchr::land_vect
+)
+# plot mean fetch from a polygon object
+plot(fetch_poly)
+
+# increase the maximum distance to calculate fetch lengths out to 200km
+increase_max_dist <- fetchr::get_fetch(
+r        = fetchr::landwater,
+max_dist = 200000,
+ncores   = 4                      # increase the number of cores used on computer
+)
+
+# plot mean fetch going out 200km
+plot(increase_max_dist)
+}
+}

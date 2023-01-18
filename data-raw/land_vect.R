@@ -1,10 +1,7 @@
-## code to prepare `land_vect` dataset goes here
-#' @title Land vector polygon
-#' @description  Example land vector polygon
-#' @importFrom AOI aoi_get
-#' @importFrom terra vect project ext rast crs rasterize crop as.polygons
-#' @importFrom sf st_as_sf
-#' @export
+library(AOI)
+library(sf)
+library(terra)
+library(usethis)
 
 # state of interest
 st <-

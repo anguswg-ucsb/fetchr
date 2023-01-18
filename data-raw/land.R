@@ -1,10 +1,8 @@
-## code to prepare `land` dataset goes here
-#' @title Land raster
-#' @description  Example land raster. Values of 1 indicate land and all other values are NA. Implied that NA values are water cells
-#' @importFrom AOI aoi_get
-#' @importFrom terra vect project ext rast crs rasterize crop
-#' @importFrom raster raster
-#' @export
+library(AOI)
+library(sf)
+library(terra)
+library(raster)
+library(usethis)
 
 # state of interest
 st <-

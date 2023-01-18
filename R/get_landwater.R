@@ -2,9 +2,8 @@
 #' @description returns a template SpatRaster. All cell values are 1 so the template raster is not actually "empty
 #' @param r SpatRaster, SpatVector or SF object with a Projected Coordinate System CRS.
 #' @param res numeric resolution for template raster. Default is 2000, generates a template raster with a grid cell resolution of 2000x2000.
-#' @importFrom terra rast crs ext
+#' @importFrom terra rast crs ext vect
 #' @return SpatRaster of template grid
-#' @export
 make_grid = function(
     r,
     res = 2000
@@ -204,7 +203,7 @@ prep_poly <- function(
   r <- fix_grid(
     r       = r,
     res     = res,
-    verbose = TRUE
+    verbose = FALSE
   )
 
   # convert all cells == water_value to 1 and non water_value cells to 0
@@ -270,7 +269,7 @@ prep_raster <- function(
   r <- fix_grid(
           r       = r,
           res     = res,
-          verbose = TRUE
+          verbose = FALSE
           )
 
   # set all water cells to a given value and all other cells to another. Presumes raster is just land and water binary.

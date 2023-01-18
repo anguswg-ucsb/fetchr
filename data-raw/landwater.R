@@ -1,10 +1,8 @@
-## code to prepare `landwater` dataset goes here
-#' @title Binary landwater raster
-#' @description  Example binary landwater raster. Values of 1 indicate land and values of 0 indicate water.
-#' @importFrom AOI aoi_get
-#' @importFrom terra vect project ext rast crs rasterize crop setValues values
-#' @importFrom raster raster
-#' @export
+library(AOI)
+library(sf)
+library(terra)
+library(raster)
+library(usethis)
 
 # state of interest
 st <-
