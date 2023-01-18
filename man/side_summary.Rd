@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_fetch.R
 \name{side_summary}
 \alias{side_summary}
-\title{Summarize lengths of sequential raster cells horizontalally and vertically}
+\title{Summarize lengths of sequential raster cells horizontally and vertically}
 \usage{
 side_summary(
   m,
@@ -33,5 +33,5 @@ side_summary(
 returns a list of summarized side lengths for every water cell, the same length as the number of rows in the input indices_df dataframe
 }
 \description{
-Internal function for calculating distances horizonatlly and vertically for specified indices of a matrix.
+Internal function for calculating distances horizontally and vertically for specified indices of a matrix.
 }

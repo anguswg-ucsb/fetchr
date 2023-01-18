@@ -1,6 +1,6 @@
 Package: fetchr
 Title: fetchr
-Version: 0.0.0.9000
+Version: 1.1.0.0000
 Authors@R: 
     person("Angus", "Watters", , "anguswatters@gmail.com", role = c("aut", "cre"))
 Description: Provides functions for fast and scalable fetch distance calculations for landwater raster data. Polygon based approaches for calculating multipoint and multidirection distance-to-land values are avaliable and work on a small scale with a small number of points. A raster based approach allows for a much greater number of points to be processed in a fraction of the time and without crashing ones computer.
@@ -13,10 +13,10 @@ Imports:
     stats,
     dplyr,
     parallel,
-    terra, 
-    tidyr,
+    terra,
     raster,
-    sf
+    sf,
+    methods
 Depends: 
     R (>= 2.10)
 LazyData: true

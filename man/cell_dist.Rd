@@ -9,8 +9,7 @@ cell_dist(
   cell_res = 2000,
   max_dist = 1e+05,
   func = "mean",
-  na_remove = TRUE,
-  verbose = FALSE
+  na_remove = TRUE
 )
 }
 \arguments{
@@ -23,8 +22,6 @@ cell_dist(
 \item{func}{character R function to apply to distances from each cell. Either mean, min, max, or sum.}
 
 \item{na_remove}{logical. argument passed to na.rm = in R func. Default is TRUE, remove NAs}
-
-\item{verbose}{logical, print messages. Default is FALSE}
 }
 \value{
 dataframe of summarized cell distances

@@ -2,22 +2,23 @@
 % Please edit documentation in R/get_landwater.R
 \name{get_landwater}
 \alias{get_landwater}
-\title{Make a binary land water raster from multiple land types raster.}
+\title{Prepare a spatial object for fetch calculations}
 \usage{
 get_landwater(r, water_value = NA, res = 2000, verbose = TRUE)
 }
 \arguments{
-\item{r}{SpatRaster, RasterLayer, SpatVect or a filepath (character) to raster data. Data must be on a projected CRS.}
+\item{r}{sf POLYGON/MULTIPOLYGON, terra SpatVect POLYGON, SpatRaster, RasterLayer, or a file path (character) to a vector/raster data file. Data must be on a projected CRS.}
 
-\item{water_value}{numeric, value of water cells in input raster. Default is NA.}
+\item{water_value}{numeric, value indicating the value of the water cells within the input raster. If a sf/terra polygon is given, this argument is ignored. Default is NA, such that NA cells are treated as water cells and all other cells are land cells.}
 
-\item{res}{numeric resolution for template raster. Default is 2000, generates a raster with a grid cell resolution of 2000x2000.}
+\item{res}{numeric resolution for template raster. If a polygon is given, the polygon must be rasterized at a specific resolution. This argument is ignored if a raster/terra raster is given. Default is 2000, which will rasterize polygons onto a grid with a grid cell resolution of 2000 x 2000.}
 
-\item{verbose}{logical, whether messages should be printed. Default is TRUE, no messages print.}
+\item{verbose}{logical, whether messages should be printed. Default is TRUE, so messages will print.}
 }
 \value{
-SpatRaster, a binary land water raster with land cells set to 1 and water cells set to 0.
+SpatRaster, binary landwater raster with land values of 0 and water values of 1
 }
 \description{
-returns a binary land water raster with land cells set to 1 and water cells set to 0. A water value should be specified to indicate which pixel value should represent water in the final raster. The rest of the pixels will indicate land cells.
+Provides a method for preprocessing sf/terra polygons or raster/terra rasters for calculating fetch using get_fetch(). When provided raster data, the default behavior is to treat all NA cells as water cells and all non NA cells as land. If you want to specify a different value for water cells, use the water_value argument to specify the grid cells that represent water. Returns a binary landwater SpatRaster with land values of 0 and water values of 1.
+A water value should be specified to indicate which pixel value should represent water in the final raster. The rest of the pixels will indicate land cells.
 }

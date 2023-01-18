@@ -2,22 +2,36 @@
 % Please edit documentation in R/get_fetch.R
 \name{get_fetch}
 \alias{get_fetch}
-\title{Generate a raster of mean fetch lengths from a binary land-water raster.}
+\title{Calculate wind fetch distances from spatial objects}
 \usage{
-get_fetch(r = NULL, max_dist = 1e+05, ncores = 2, verbose = TRUE)
+get_fetch(
+  r = NULL,
+  max_dist = 1e+05,
+  res = 2000,
+  water_value = NA,
+  func = "mean",
+  ncores = 2,
+  verbose = TRUE
+)
 }
 \arguments{
-\item{r}{SpatRaster, RasterLayer or file path (character) to binary land type raster TIF. Land and water values only.}
+\item{r}{terra SpatRaster, raster RasterLayer, sf POLYGON/MULTIPOLYGON geometry, terra SpatVector POLYGON/MULTIPOLYGON geometry, or a character filepath pointing to a .shp, .gpkg, .geojson, or .tif file representing land and water. Provide a SpatRaster or RasterLayer should be a binary landwater raster with land values of 0 and water values of 1.}
 
-\item{max_dist}{numeric maximum distance (meters) to calculate fetch values out to. Default is 100000m (100km)}
+\item{max_dist}{numeric, maximum distance (meters) to calculate fetch values out to. Default is 100,000m (100km)}
+
+\item{res}{numeric, specifying the desired resolution of the output raster when providing a polygon. If a polygon is given, the polygon must be rasterized at a specific resolution. This argument is ignored if a raster/terra raster is given. Default is 2000, which will rasterize polygons onto a grid with a grid cell resolution of 2000 x 2000.}
+
+\item{water_value}{numeric, value indicating the value of the water cells within the input raster. If a sf/terra polygon is given, this argument is ignored. Default is NA, such that NA cells are treated as water cells and all other cells are land cells.}
+
+\item{func}{character R function to apply to distances from each cell. Either mean, min, max, or sum.}
 
 \item{ncores}{numeric indicating how many cores to use during parallel processing. Default is 2.}
 
 \item{verbose}{logical, whether messages should be printed. Default is FALSE, no messages print.}
 }
 \value{
-SpatRaster with the mean fetch distance from land calculated for every water pixel.
+SpatRaster of mean, max, min, or total wind fetch distances from land calculated for every water pixel.
 }
 \description{
-Given a binary land and water raster, this function will calculate the mean distance a water cell is away from land. The fetch distance is the mean distance between the given water cell and the next land cell in 8 directions (horizontally, vertically, and diagonally). Returns a raster of the same CRS, resolution, and extent as the input land water raster.
+This function will calculate the mean, maximum, minimum, or total fetch distance in 8 directions (horizontally, vertically, and diagonally). When provided raster data, the default behavior is to treat all NA cells as water cells and all non NA cells as land. If you want to specify a different value for water cells, use the water_value argument to specify the grid cells that represent water. When a sf/terra polygon is provided, a cell resolution must be provided to specify the desired resolution of the output raster. Returns a binary landwater SpatRaster with land values of 0 and water values of 1.Returns a raster of the same CRS, resolution, and extent as the input raster or vector.
 }

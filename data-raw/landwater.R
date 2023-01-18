@@ -6,7 +6,6 @@
 #' @importFrom raster raster
 #' @export
 
-
 # state of interest
 st <-
   AOI::aoi_get(state = "CA") %>%

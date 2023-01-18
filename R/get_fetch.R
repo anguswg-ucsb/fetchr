@@ -364,6 +364,7 @@ diag_summary <- function(
       if(verbose == TRUE) {
         message(paste0(n, "/", nrow(indices_df)))
       }
+
       diag <- diag_dist(
         m          = m,
         row_index  = indices_df$row[n],
@@ -468,8 +469,8 @@ diag_summary <- function(
 # stop parallel processing clusters
 # parallel::stopCluster(clust)
 
-#' Summarize lengths of sequential raster cells horizontalally and vertically
-#' @description Internal function for calculating distances horizonatlly and vertically for specified indices of a matrix.
+#' Summarize lengths of sequential raster cells horizontally and vertically
+#' @description Internal function for calculating distances horizontally and vertically for specified indices of a matrix.
 #' @param m matrix of interest
 #' @param indices_df dataframe of matrix indices from which to calculate lengths from
 #' @param cell_res numeric, resolution of raster cells. Default is 2000
@@ -492,10 +493,6 @@ side_summary <- function(
 
   # if smaller number of points, no parallel processing needed
   if(nrow(indices_df) <= 4000) {
-
-    # if(verbose == TRUE) {
-    #   message(paste0("Small number of cells, no parallel processing required"))
-    # }
 
     # system.time(
     # side counts/lengths directions
@@ -531,37 +528,15 @@ side_summary <- function(
         ncores <- 2
         }
       }
-      # if(verbose == TRUE) {
-      #   message(paste0("Initializing parallel processing: "))
-      #   message(paste0("Cores: ", ncores))
-      # }
-    # } else {
-    #   if(verbose == TRUE) {
-    #     message(paste0("Initializing parallel processing: "))
-    #     message(paste0("Cores: ", ncores))
-    #   }
-    # }
 
-    # system.time(
     # initiate parallel clusters
     clust <- parallel::makeCluster(ncores)
-    # )
 
-    # system.time(
     # export variables to clusters and load packages
     parallel::clusterExport(clust, c('cell_res', 'max_dist', "side_count", "check_cols",
                                      "check_rows", "check_length", "m", "indices_df", "verbose"),
                             envir=environment())
-    # )
 
-    # system.time(
-    # export packages to clusters and load
-    # parallel::clusterEvalQ(clust, {
-    #   library(dplyr)
-    #   library(tidyr)
-    # }))
-
-    # system.time(
     # side counts/lengths directions
     side_lengths <- parallel::parLapply(cl = clust, 1:nrow(indices_df), function(z) {
 
@@ -578,12 +553,9 @@ side_summary <- function(
       )
 
     })
-    # )
 
-    # system.time(
     # stop parallel processing clusters
     parallel::stopCluster(clust)
-    # )
 
     return(side_lengths)
 
@@ -1321,7 +1293,10 @@ check_length <- function(
 #' @param rle_vect rle object
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
 #' @return Count of consecutive non-zero cells from a matrix cell, extending out in a given direction
-check_zeros <- function(rle_vect, verbose = FALSE) {
+check_zeros <- function(
+    rle_vect,
+    verbose = FALSE
+    ) {
 
   # check if any zeros occur after calculating RLE on a vector
   if(0 %in% unique(rle_vect$values)) {
@@ -1367,7 +1342,6 @@ side_count <- function(
     col_index = NULL,
     cell_res  = 2000,
     max_dist  = 100000,
-    # avg_count = TRUE,
     func      = "mean",
     as_df     = FALSE,
     verbose   = FALSE
@@ -1425,34 +1399,11 @@ side_count <- function(
     max_count = max_count
   )
 
-  # # count of cells on up/down/left/right side of cell before a 0 occurs
-  # side_df <- data.frame(
-  #   row         = row_index,
-  #   col         = col_index,
-  #   direction   = c("up", "down", "left", "right"),
-  #   cell_count  = c(up_count, down_count, left_count, right_count)
-  #   # cell_count  = c(55, 3, 2, 98))
-
-  # # omit NAs
-  # side_df <- na.omit(side_df)
-
-  # if any cell counts are above max count distance, convert to max count
-  # if(length(which(side_df$cell_count > max_count)) != 0) {
-  #   if(verbose == TRUE) {
-  #     message(paste0("updating cell counts to max: ", max_count))
-  #   }
-  #   side_df[side_df$cell_count > max_count, ]$cell_count <- max_count
-  # }
-
   # return average cell count around cell
   if(as_df == FALSE) {
 
     # calculate average in all directions
-    # fcell_count <-  func(side_df$cell_count, na.rm = T)
-
-    # calculate average in all directions
     fcell_count <-  func(c(up_count, down_count, left_count, right_count), na.rm = T)
-    # fcell_count <-  c(up_count, down_count, left_count, right_count)
 
     return(fcell_count)
 
@@ -1464,7 +1415,6 @@ side_count <- function(
       col         = col_index,
       direction   = c("up", "down", "left", "right"),
       cell_count  = c(up_count, down_count, left_count, right_count)
-      # cell_count  = c(55, 3, 2, 98)
     )
 
     # omit NAs
@@ -1485,35 +1435,65 @@ side_count <- function(
 #' @param max_dist numeric max distance to calculate fetch distance. Default is 100000 (100km).
 #' @param func character R function to apply to distances from each cell. Either mean, min, max, or sum.
 #' @param na_remove logical. argument passed to na.rm = in R func. Default is TRUE, remove NAs
-#' @param verbose logical, print messages. Default is FALSE
 #' @return dataframe of summarized cell distances
-#' @importFrom dplyr `%>%` group_by summarise ungroup mutate case_when
+#' @importFrom dplyr `%>%` group_by summarise
 cell_dist <- function(
     indices_df,
     cell_res  = 2000,
     max_dist  = 100000,
     func      = "mean",
-    na_remove = TRUE,
-    verbose   = FALSE
-) {
+    na_remove = TRUE
+    ) {
 
-  # match function to R function
-  func <- match.fun(func)
+  # suppress warnings, particularlly dplyr::summarise warning
+  suppressWarnings({
 
-  # calculate distance from cell counts
-  cell_distance <-
-    indices_df %>%
-    dplyr::group_by(row, col) %>%
-    dplyr::summarise(cell_count = func(cell_count, na.rm = na_remove)) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(
-      cell_res       = cell_res,
-      # distance       = cell_count*cell_res
-      distance       = dplyr::case_when(
-        cell_count*cell_res > max_dist ~ max_dist,
-        TRUE                           ~ cell_count*cell_res
-      )
-    )
+    # match function to R function
+    func <- match.fun(func)
+
+    # calculate distance from cell counts
+    cell_distance <-
+      indices_df %>%
+      dplyr::group_by(row, col) %>%
+      dplyr::summarise(
+        diag_cell_count = func(diag_cell_count, na.rm = na_remove),
+        side_cell_count = func(side_cell_count, na.rm = na_remove)
+        )
+
+    # loop through each cell and calculate given function value
+    cell_distance <- lapply(1:nrow(cell_distance), function(i) {
+                          c(cell_distance$row[i], cell_distance$col[i],
+                            func(c(cell_distance$diag_cell_count[i], cell_distance$side_cell_count[i]), na.rm = na_remove)
+                            )
+      }) %>%
+      do.call(rbind, .) %>%
+      as.data.frame()
+
+    # add cell resolution column
+    cell_distance$cell_res <- cell_res
+
+    # add distance column
+    cell_distance$distance <- ifelse(cell_distance$V3*cell_distance$cell_res > max_dist, max_dist, cell_distance$V3*cell_distance$cell_res)
+
+    # assign column names to cell_distance dataframe
+    names(cell_distance) <- c("row", "col", "cell_count", "cell_res", "distance")
+
+    # calculate distance from cell counts
+    # cell_distance <-
+    #   indices_df %>%
+    #   dplyr::group_by(row, col) %>%
+    #   dplyr::summarise(cell_count = func(cell_count, na.rm = na_remove)) %>%
+    #   dplyr::ungroup() %>%
+    #   dplyr::mutate(
+    #     cell_res       = cell_res,
+    #     # distance       = cell_count*cell_res
+    #     distance       = dplyr::case_when(
+    #       cell_count*cell_res > max_dist ~ max_dist,
+    #       TRUE                           ~ cell_count*cell_res
+    #     )
+    #   )
+
+    })
 
   return(cell_distance)
 
@@ -1628,75 +1608,55 @@ cell_dist <- function(
 #
 # }
 
-#' Generate a raster of mean fetch lengths from a binary land-water raster.
-#' @description Given a binary land and water raster, this function will calculate the mean distance a water cell is away from land. The fetch distance is the mean distance between the given water cell and the next land cell in 8 directions (horizontally, vertically, and diagonally). Returns a raster of the same CRS, resolution, and extent as the input land water raster.
-#' @param r SpatRaster, RasterLayer or file path (character) to binary land type raster TIF. Land and water values only.
-#' @param max_dist numeric maximum distance (meters) to calculate fetch values out to. Default is 100000m (100km)
+#' Calculate wind fetch distances from spatial objects
+#' @description This function will calculate the mean, maximum, minimum, or total fetch distance in 8 directions (horizontally, vertically, and diagonally). When provided raster data, the default behavior is to treat all NA cells as water cells and all non NA cells as land. If you want to specify a different value for water cells, use the water_value argument to specify the grid cells that represent water. When a sf/terra polygon is provided, a cell resolution must be provided to specify the desired resolution of the output raster. Returns a binary landwater SpatRaster with land values of 0 and water values of 1.Returns a raster of the same CRS, resolution, and extent as the input raster or vector.
+#' @param r terra SpatRaster, raster RasterLayer, sf POLYGON/MULTIPOLYGON geometry, terra SpatVector POLYGON/MULTIPOLYGON geometry, or a character filepath pointing to a .shp, .gpkg, .geojson, or .tif file representing land and water. Provide a SpatRaster or RasterLayer should be a binary landwater raster with land values of 0 and water values of 1.
+#' @param max_dist numeric, maximum distance (meters) to calculate fetch values out to. Default is 100,000m (100km)
+#' @param res numeric, specifying the desired resolution of the output raster when providing a polygon. If a polygon is given, the polygon must be rasterized at a specific resolution. This argument is ignored if a raster/terra raster is given. Default is 2000, which will rasterize polygons onto a grid with a grid cell resolution of 2000 x 2000.
+#' @param water_value numeric, value indicating the value of the water cells within the input raster. If a sf/terra polygon is given, this argument is ignored. Default is NA, such that NA cells are treated as water cells and all other cells are land cells.
+#' @param func character R function to apply to distances from each cell. Either mean, min, max, or sum.
 #' @param ncores numeric indicating how many cores to use during parallel processing. Default is 2.
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
-#' @return SpatRaster with the mean fetch distance from land calculated for every water pixel.
-#' @importFrom dplyr `%>%` arrange group_by group_split mutate select bind_rows n summarise case_when ungroup left_join
-#' @importFrom tidyr pivot_longer
+#' @return SpatRaster of mean, max, min, or total wind fetch distances from land calculated for every water pixel.
+#' @importFrom dplyr `%>%` arrange group_by summarise left_join
 #' @importFrom terra as.matrix rast nrow ncol crs ext
 #' @export
 get_fetch = function(
     r              = NULL,
     max_dist       = 100000,
+    res            = 2000,
+    water_value    = NA,
+    func           = "mean",
     ncores         = 2,
     verbose        = TRUE
 ) {
 
-
   # error if no path or raster are given
   if(is.null(r)) {
 
-    stop(paste0("Please enter a path to a SpatRaster, RasterLayer, or a file path to a raster containing land and water cells with values of 1 and 0, respectively"))
-
+    stop(r_error_msg())
   }
 
-  # if RasterLayer given
-  if(class(r) == "RasterLayer") {
-    if(verbose == TRUE) {
-      message(paste0("Converting RasterLayer to SpatRaster..."))
-    }
-
-    r <- terra::rast(r)
-
-  }
-
-  # IF filepath given
-  if(class(r) == "character") {
-
-    if(verbose == TRUE) {
-      message(paste0("Reading data as SpatRaster..."))
-      message(paste0("File path: ", r))
-    }
-
-    r <- terra::rast(r)
-
-  }
-
-  # make sure raster/shape is in a projected CRS
-  if(terra::is.lonlat(r) == TRUE) {
-
-    stop(paste0("Incorrest lat/long CRS, spatial object must be in a projected CRS"))
-
-  }
+  # process input data to meet specifications for calculating fetch
+  r <- get_landwater(
+          r              = r,
+          water_value    = water_value,
+          res            = res,
+          verbose        = FALSE
+        )
 
   if(verbose == TRUE) {
-
     message(paste0("Calculating Fetch..."))
-
   }
 
   # cell resolution for distance calcs
-  cell_res <- terra::res(r)[1]
+  cell_res  <- terra::res(r)[1]
 
   # max count distance
   max_count <- floor(max_dist/(cell_res))
 
   # make landwater raster a wide matrix
-  rmat <- terra::as.matrix(r, wide = TRUE)
+  rmat      <- terra::as.matrix(r, wide = TRUE)
 
   # get indices of water points
   idx <-
@@ -1706,10 +1666,9 @@ get_fetch = function(
 
   # verbose = T
   if(verbose == TRUE) {
-    message(paste0("Calculating North/South/East/West distances"))
+    message(paste0("Calculating north/south/east/west distances"))
   }
 
-# system.time(
   # side cell totals list
   side_lst <- side_summary(
     m          = rmat,
@@ -1720,24 +1679,20 @@ get_fetch = function(
     ncores     = ncores,
     verbose    = T
   )
-# )
 
   if(verbose == TRUE) {
     message(paste0("Calculating diagonal distances"))
   }
 
-# lapply(side_lst, `[[`, '.')), side_lst, diag_lst)
-system.time(
   # diagonal totals list
   diag_lst <- diag_summary(
     m          = rmat,
     indices_df = idx,
     func       = "mean",
     max_count  = max_count,
-    ncores     = 12,
+    ncores     = ncores,
     verbose    = FALSE
   )
-)
 
   # add mean diagonal cell counts
   idx$diag_cell_count <- unlist(diag_lst)
@@ -1746,20 +1701,20 @@ system.time(
   idx$side_cell_count <- unlist(side_lst)
 
   # pivot data to long w/ single column for cell counts
-  idx <-
-    idx %>%
-    tidyr::pivot_longer(
-      cols      = c(diag_cell_count, side_cell_count),
-      names_to  = "direction",
-      values_to = "cell_count"
-    )
+  # idx <-
+    # idx %>%
+    # tidyr::pivot_longer(
+    #   cols      = c(diag_cell_count, side_cell_count),
+    #   names_to  = "direction",
+    #   values_to = "cell_count"
+    # )
 
-  # calcualte cell distances from cell counts
+  # calculate cell distances from cell counts
   dist_mat <- cell_dist(
     indices_df = idx,
     cell_res   = cell_res,
     max_dist   = max_dist,
-    func       = "mean",
+    func       = func,
     na_remove  = TRUE
   )
 
@@ -1773,7 +1728,7 @@ system.time(
               row = 1:terra::nrow(r),
               col = 1:terra::ncol(r)
             ),
-            dplyr::select(dist_mat, row, col, distance),
+            dist_mat[, c("row", "col", "distance")],
             by = c("row", "col")
           ),
           row
@@ -1788,24 +1743,103 @@ system.time(
 
   return(fetch_r)
 }
-
-#   # Reclassify fetch values
-# fetch_mat_shallow <- matrix(
-#   c(0, 1000, 1,
-#     1000, 5000, .5,
-#     5000, 20001, .2),
-#   ncol=3,
-#   byrow = T
+# r              = NULL
+# max_dist       = 100000
+# res            = 4000
+# water_value    = NA
+# func           = "mean"
+# ncores         = 4
+# verbose        = TRUE
+#
+# library(dplyr)
+# library(terra)
+# aoi <-
+#   AOI::aoi_get(state = "Florida") %>%
+#   sf::st_transform(5070)
+#
+# tmp <- get_fetch2(
+#   r = aoi,
+#   max_dist = 100000,
+#   res = 4000,
+#   water_value = NA,
+#   func = "mean",
+#   ncores = 4)
+#
+# plot(tmp)
+# aoi <- AOI::aoi_get(state = "Florida")
+# tmp <- get_fetch2(
+#   r = aoi,
+#   max_dist = 100000,
+#   res = 4000,
+#   water_value = NA,
+#   func = "mean",
+#   ncores = 4)
+#
+# plot(tmp)
+#
+# aoi <- AOI::aoi_get(state = "Florida") %>%
+#   sf::st_transform(5070) %>%
+#   terra::vect()
+# tmp <- get_fetch2(
+#   r = aoi,
+#   max_dist = 100000,
+#   res = 4000,
+#   water_value = NA,
+#   func = "mean",
+#   ncores = 4)
+#
+# plot(tmp)
+# aoi <- AOI::aoi_get(state = "Florida") %>%
+#   terra::vect()
+# tmp <- get_fetch2(
+#   r = aoi,
+#   max_dist = 100000,
+#   res = 4000,
+#   water_value = NA,
+#   func = "mean",
+#   ncores = 4)
+#
+# plot(tmp)
+#
+# aoi <- AOI::aoi_get(state = "Florida") %>%
+#   sf::st_transform(5070)
+# aoi2 <- prep_landwater(r = aoi, res = 4000)
+# plot(aoi2)
+#
+# aoi2 <- terra::setValues(
+#   aoi2, ifelse(terra::values(aoi2) == 1, NA, 0)
 # )
 #
-# #   # calculate CV SI
-# #   # Fetch shallow/deep SI
-#   fetch_shallow_cv            <- terra::classify(fetch_r, fetch_mat_shallow)
-# #   fetch_deep_cv               <- terra::classify(fetch_r, fetch_mat_deep)
-#   plot(fetch_shallow_cv)
-# #   plot(fetch_deep_cv)
-# tmp1 <- raster::raster(fetch_r)
-# tmp2 <- raster::raster(fetch_r2)
-# oldfetch <- raster::raster("C:/Users/angus/OneDrive/Desktop/github/cpra_orz/data/fetch/fetch_raster_S07_03_03.tif")
-# # tmp_crop <- raster::raster(lw_crop)
-# mapview::mapview(tmp1) + oldfetch +tmp2
+# plot(aoi2)
+# tmp <- get_fetch2(
+#   r = aoi2,
+#   max_dist = 100000,
+#   res = 4000,
+#   water_value = NA,
+#   func = "mean",
+#   ncores = 4
+#   )
+#
+# plot(tmp)
+#
+# aoi <- AOI::aoi_get(state = "Florida") %>%
+#   sf::st_transform(5070)
+# aoi2 <- prep_landwater(r = aoi, res = 4000)
+# plot(aoi2)
+#
+# aoi2 <- terra::setValues(
+#   aoi2, ifelse(terra::values(aoi2) == 1, 5, 0)
+# ) %>%
+#   raster::raster()
+#
+# plot(aoi2)
+# tmp <- get_fetch2(
+#   r = aoi2,
+#   max_dist = 100000,
+#   res = 4000,
+#   water_value = 5,
+#   func = "mean",
+#   ncores = 4
+# )
+#
+# plot(tmp)
