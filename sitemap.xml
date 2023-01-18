@@ -37,6 +37,12 @@
     <loc>https://anguswg-ucsb.github.io/fetchr/reference/diag_summary.html</loc>
   </url>
   <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/filepath_error_msg.html</loc>
+  </url>
+  <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/fix_grid.html</loc>
+  </url>
+  <url>
     <loc>https://anguswg-ucsb.github.io/fetchr/reference/get_fetch.html</loc>
   </url>
   <url>
@@ -62,6 +68,18 @@
   </url>
   <url>
     <loc>https://anguswg-ucsb.github.io/fetchr/reference/make_grid.html</loc>
+  </url>
+  <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/prep_filepath.html</loc>
+  </url>
+  <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/prep_poly.html</loc>
+  </url>
+  <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/prep_raster.html</loc>
+  </url>
+  <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/r_error_msg.html</loc>
   </url>
   <url>
     <loc>https://anguswg-ucsb.github.io/fetchr/reference/side_count.html</loc>
