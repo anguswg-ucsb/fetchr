@@ -1,9 +1,11 @@
 Package: fetchr
-Title: fetchr
+Title: fetchr: Calculate Fetch Distances for Geospatial Data
 Version: 1.1.0.1000
 Authors@R: 
     person("Angus", "Watters", , "anguswatters@gmail.com", role = c("aut", "cre"))
-Description: Provides functions for fast and scalable fetch distance calculations for landwater raster data. Polygon based approaches for calculating multipoint and multidirection distance-to-land values are avaliable and work on a small scale with a small number of points. A raster based approach allows for a much greater number of points to be processed in a fraction of the time and without crashing ones computer.
+Description: Provides functions for fast and scalable fetch distance calculations for landwater raster or vector data. 
+    Polygon based approaches for calculating multipoint and multidirection distance-to-land values are avaliable and work on a small scale with a small number of points. 
+    A raster based approach allows for a much greater number of points to be processed in a fraction of the time that other vector based approaches take. 
 BugReports: https://github.com/anguswg-ucsb/fetchr/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -21,4 +23,4 @@ Suggests:
 Depends: 
     R (>= 2.10)
 LazyData: true
-URL: https://anguswg-ucsb.github.io/fetchr/
+URL: https://anguswg-ucsb.github.io/fetchr/, https://anguswg-ucsb.github.io/fetchr/

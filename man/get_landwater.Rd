@@ -22,3 +22,12 @@ SpatRaster, binary landwater raster with land values of 0 and water values of 1
 Provides a method for preprocessing sf/terra polygons or raster/terra rasters for calculating fetch using get_fetch(). When provided raster data, the default behavior is to treat all NA cells as water cells and all non NA cells as land. If you want to specify a different value for water cells, use the water_value argument to specify the grid cells that represent water. Returns a binary landwater SpatRaster with land values of 0 and water values of 1.
 A water value should be specified to indicate which pixel value should represent water in the final raster. The rest of the pixels will indicate land cells.
 }
+\examples{
+\dontrun{
+# Create a binary landwater SpatRaster from a sf polygon at a 2000m x 2000m resolution
+lw <- fetchr::get_landwater(
+                r   = fetchr::land_vect,
+                res = 2000
+                )
+}
+}

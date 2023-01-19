@@ -3,4 +3,4 @@
 .RData
 .Ruserdata
 docs
-^data-raw$
+data-raw/

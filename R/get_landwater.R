@@ -361,6 +361,14 @@ fix_grid <- function(
 #' @importFrom methods is
 #' @return SpatRaster, binary landwater raster with land values of 0 and water values of 1
 #' @export
+#' @examples
+#' \dontrun{
+#' # Create a binary landwater SpatRaster from a sf polygon at a 2000m x 2000m resolution
+#' lw <- fetchr::get_landwater(
+#'                 r   = fetchr::land_vect,
+#'                 res = 2000
+#'                 )
+#' }
 get_landwater <- function(
     r,
     water_value    = NA,
