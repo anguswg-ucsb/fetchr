@@ -5,7 +5,7 @@
 \alias{land_vect}
 \title{Land vector polygon}
 \format{
-An object of class \code{sf} (inherits from \code{data.frame}) with 1 rows and 2 columns.
+An object of class \code{PackedSpatVector} of length 1.
 }
 \usage{
 land_vect

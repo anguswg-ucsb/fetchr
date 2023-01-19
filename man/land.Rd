@@ -5,7 +5,7 @@
 \alias{land}
 \title{Land raster}
 \format{
-An object of class \code{RasterLayer} of dimension 189 x 183 x 1.
+An object of class \code{PackedSpatRaster} of length 1.
 }
 \usage{
 land
