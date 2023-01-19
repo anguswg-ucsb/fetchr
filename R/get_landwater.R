@@ -443,68 +443,68 @@ get_landwater <- function(
 #' @param as_sf logical, should polygon be returned as an SF object. Default is FALSE, returns a terra vect object
 #' @importFrom terra setValues values
 #' @return SpatRaster with only land cells having a value, all other cells are NA
-get_land = function(
-    r,
-    land_value = 0,
-    out_value  = 2,
-    as_polygon = FALSE,
-    as_sf      = FALSE
-) {
-
-  # if cell value is 1 (land) make it a value of 2, otherwise make cell NA
-  land <- terra::setValues(
-    r, ifelse(terra::values(r) == land_value, out_value, NA)
-  )
-
-  # if a polygon should be returned instead of a raster
-  if(as_polygon == TRUE) {
-
-    # if polygon should be returned as an SF object
-    if(as_sf == TRUE) {
-
-      message("Generating land polygon...")
-      message("Type: SF")
-
-      # SF land polygon
-      land <-
-        land %>%
-        terra::as.polygons() %>%
-        sf::st_as_sf()  %>%
-        sf::st_make_valid() %>%
-        sf::st_cast() %>%
-        stats::setNames(c("land", "geometry")) %>%
-        sf::st_transform(26915)
-
-      # return as terra vect object
-    } else {
-
-      message("Generating land polygon...")
-      message("Type: SpatVector")
-
-      # spatvector land polygon
-      land <-
-        land %>%
-        terra::as.polygons() %>%
-        stats::setNames(c("land"))
-
-    }
-
-
-  } else {
-
-    message("Generating land raster...")
-    message("Type: SpatRaster")
-
-  }
-
-  return(land)
-
-  # view map
-  # land %>%
-  #   raster::raster()%>%
-  #   mapview::mapview()
-
-}
+# get_land = function(
+#     r,
+#     land_value = 0,
+#     out_value  = 2,
+#     as_polygon = FALSE,
+#     as_sf      = FALSE
+# ) {
+#
+#   # if cell value is 1 (land) make it a value of 2, otherwise make cell NA
+#   land <- terra::setValues(
+#     r, ifelse(terra::values(r) == land_value, out_value, NA)
+#   )
+#
+#   # if a polygon should be returned instead of a raster
+#   if(as_polygon == TRUE) {
+#
+#     # if polygon should be returned as an SF object
+#     if(as_sf == TRUE) {
+#
+#       message("Generating land polygon...")
+#       message("Type: SF")
+#
+#       # SF land polygon
+#       land <-
+#         land %>%
+#         terra::as.polygons() %>%
+#         sf::st_as_sf()  %>%
+#         sf::st_make_valid() %>%
+#         sf::st_cast() %>%
+#         stats::setNames(c("land", "geometry")) %>%
+#         sf::st_transform(26915)
+#
+#       # return as terra vect object
+#     } else {
+#
+#       message("Generating land polygon...")
+#       message("Type: SpatVector")
+#
+#       # spatvector land polygon
+#       land <-
+#         land %>%
+#         terra::as.polygons() %>%
+#         stats::setNames(c("land"))
+#
+#     }
+#
+#
+#   } else {
+#
+#     message("Generating land raster...")
+#     message("Type: SpatRaster")
+#
+#   }
+#
+#   return(land)
+#
+#   # view map
+#   # land %>%
+#   #   raster::raster()%>%
+#   #   mapview::mapview()
+#
+# }
 
 #' Make a water raster from binary land type raster
 #' @description returns a SpatRaster of only water cells. Water cells have a value of 1 by default, all other cells are NA. Fits the HSI raster specifications.
@@ -515,47 +515,47 @@ get_land = function(
 #' @param as_sf logical, should polygon be returned as an SF object. Default is FALSE, returns a terra vect object
 #' @importFrom terra setValues values
 #' @return SpatRaster with only land cells having a value, all other cells are NA
-get_water = function(
-    r,
-    water_value = 1,
-    out_value   = 1,
-    as_polygon  = FALSE,
-    as_sf       = FALSE
-) {
-
-  # if cell value is 1 (land) make it a value of 2, otherwise make cell NA
-  water <- terra::setValues(
-    r, ifelse(terra::values(r) == water_value, out_value, NA)
-  )
-
-  # if a polygon should be returned instead of a raster
-  if(as_polygon == TRUE) {
-
-    # if polygon should be returned as an SF object
-    if(as_sf == TRUE) {
-
-      # make polygon from water raster
-      water <-
-        water %>%
-        terra::as.polygons() %>%
-        sf::st_as_sf()  %>%
-        sf::st_make_valid() %>%
-        sf::st_cast() %>%
-        stats::setNames(c("water", "geometry")) %>%
-        sf::st_transform(26915)
-
-      # return as terra vect object
-    } else {
-
-      water <-
-        water %>%
-        terra::as.polygons() %>%
-        stats::setNames(c("water"))
-
-    }
-  }
-
-  return(water)
-
-}
-
+# get_water = function(
+#     r,
+#     water_value = 1,
+#     out_value   = 1,
+#     as_polygon  = FALSE,
+#     as_sf       = FALSE
+# ) {
+#
+#   # if cell value is 1 (land) make it a value of 2, otherwise make cell NA
+#   water <- terra::setValues(
+#     r, ifelse(terra::values(r) == water_value, out_value, NA)
+#   )
+#
+#   # if a polygon should be returned instead of a raster
+#   if(as_polygon == TRUE) {
+#
+#     # if polygon should be returned as an SF object
+#     if(as_sf == TRUE) {
+#
+#       # make polygon from water raster
+#       water <-
+#         water %>%
+#         terra::as.polygons() %>%
+#         sf::st_as_sf()  %>%
+#         sf::st_make_valid() %>%
+#         sf::st_cast() %>%
+#         stats::setNames(c("water", "geometry")) %>%
+#         sf::st_transform(26915)
+#
+#       # return as terra vect object
+#     } else {
+#
+#       water <-
+#         water %>%
+#         terra::as.polygons() %>%
+#         stats::setNames(c("water"))
+#
+#     }
+#   }
+#
+#   return(water)
+#
+# }
+#

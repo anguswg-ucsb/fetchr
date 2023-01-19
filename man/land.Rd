@@ -11,7 +11,7 @@ An object of class \code{PackedSpatRaster} of length 1.
 land
 }
 \description{
-Example land raster. Values of 1 indicate land and all other values are NA. Implied that NA values are water cells
+Example land raster. Values of 0 indicate land and all other values are NA. Implied that NA values are water cells
 }
 \examples{
 \dontrun{
