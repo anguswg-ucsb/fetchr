@@ -1,6 +1,6 @@
 #' Binary landwater raster
 #'
-#' Example binary landwater raster. Values of 1 indicate land and values of 0 indicate water.
+#' Example binary landwater raster. Values of 0 indicate land and values of 1 indicate water.
 #'
 #'
 #' @docType data

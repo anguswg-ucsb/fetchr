@@ -1436,7 +1436,7 @@ side_count <- function(
 #' @param cell_res numeric cell resolution. Default is 2000.
 #' @param max_dist numeric max distance to calculate fetch distance. Default is 100000 (100km).
 #' @param func character R function to apply to distances from each cell. Either mean, min, max, or sum.
-#' @param na_remove logical. argument passed to na.rm = in R func. Default is TRUE, remove NAs
+#' @param na_remove logical. argument passed to na.rm argument in R func. Default is TRUE, remove NAs
 #' @return dataframe of summarized cell distances
 #' @importFrom dplyr `%>%` group_by summarise
 cell_dist <- function(

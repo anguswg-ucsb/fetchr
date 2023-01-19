@@ -21,7 +21,7 @@ cell_dist(
 
 \item{func}{character R function to apply to distances from each cell. Either mean, min, max, or sum.}
 
-\item{na_remove}{logical. argument passed to na.rm = in R func. Default is TRUE, remove NAs}
+\item{na_remove}{logical. argument passed to na.rm argument in R func. Default is TRUE, remove NAs}
 }
 \value{
 dataframe of summarized cell distances
