@@ -3,6 +3,9 @@
 #' @param r SpatRaster, SpatVector or SF object with a Projected Coordinate System CRS.
 #' @param res numeric resolution for template raster. Default is 2000, generates a template raster with a grid cell resolution of 2000x2000.
 #' @importFrom terra rast crs ext vect
+#' @importFrom methods is
+#' @noRd
+#' @keywords internal
 #' @return SpatRaster of template grid
 make_grid = function(
     r,
@@ -10,7 +13,7 @@ make_grid = function(
     ) {
 
   # if SF object given, convert to SpatVector
-  if(is(r, "sf")) {
+  if(methods::is(r, "sf")) {
 
     r <- terra::vect(r)
 
@@ -29,6 +32,8 @@ make_grid = function(
 }
 
 #' Internal r error handling message
+#' @noRd
+#' @keywords internal
 #' @return character error message
 r_error_msg = function() {
 
@@ -45,6 +50,8 @@ r_error_msg = function() {
 }
 
 #' Internal filepath error handling message
+#' @noRd
+#' @keywords internal
 #' @return character error message for invalid file paths
 filepath_error_msg = function() {
 
@@ -61,6 +68,8 @@ filepath_error_msg = function() {
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
 #' @importFrom terra vect rast
 #' @importFrom methods is
+#' @noRd
+#' @keywords internal
 #' @return SpatRaster, binary landwater raster with land values of 0 and water values of 1
 prep_filepath <- function(
     r,
@@ -139,6 +148,8 @@ prep_filepath <- function(
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
 #' @importFrom terra vect is.lonlat rasterize setValues values
 #' @importFrom methods is
+#' @noRd
+#' @keywords internal
 #' @return SpatRaster, binary landwater raster with land values of 0 and water values of 1
 prep_poly <- function(
     r,
@@ -222,6 +233,8 @@ prep_poly <- function(
 #' @param verbose logical, whether messages should be printed. Default is FALSE, no messages print.
 #' @importFrom terra rast is.lonlat setValues values
 #' @importFrom methods is
+#' @noRd
+#' @keywords internal
 #' @return SpatRaster, binary landwater raster with land values of 0 and water values of 1
 prep_raster <- function(
     r,
@@ -308,6 +321,8 @@ prep_raster <- function(
 #' @param verbose logical, whether messages should be printed. Default is FALSE, so no messages will print.
 #' @importFrom terra yres xres resample
 #' @importFrom methods is
+#' @noRd
+#' @keywords internal
 #' @return SpatRaster on a regular grid at a specified resolution
 fix_grid <- function(
     r,
