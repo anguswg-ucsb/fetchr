@@ -521,8 +521,6 @@ side_summary <- function(
         cell_res  = cell_res,
         max_dist  = max_dist,
         func      = func,
-        # func      = "mean",
-        as_df     = FALSE,
         verbose   = FALSE
       )
     })
@@ -564,8 +562,6 @@ side_summary <- function(
         cell_res  = cell_res,
         max_dist  = max_dist,
         func      = func,
-        # func      = "mean",
-        as_df     = FALSE,
         verbose   = FALSE
       )
 
@@ -1356,9 +1352,7 @@ check_zeros <- function(
 #' @param cell_res numeric cell resolution. Default is 2000.
 #' @param max_dist numeric maximum distance to calculate fetch to. Default is 100000m (100km).
 #' @param func character. R function, either, mean, min, max, or sum. Default is mean calculates mean number of cells around cell
-#' @param as_df logical. whether to return a dataframe or not. Default is FALSE, returns numeric vector of mean cell count around cell.
 #' @param verbose logical, whether to print messages to console. Default is FALSE, no messages print
-#' @importFrom stats na.omit
 #' @noRd
 #' @keywords internal
 #' @return numeric indicating the average cell count in all directions or a dataframe with consequetive cell counts (non-zero cells) up/down/left/right of the specified cell in a matrix
@@ -1369,7 +1363,6 @@ side_count <- function(
     cell_res  = 2000,
     max_dist  = 100000,
     func      = "mean",
-    as_df     = FALSE,
     verbose   = FALSE
 ) {
 
@@ -1425,32 +1418,32 @@ side_count <- function(
   )
 
   # return average cell count around cell
-  if(as_df == FALSE) {
+  # if(as_df == FALSE) {
 
-    # calculate average in all directions
-    fcell_count <-  func(c(up_count, down_count, left_count, right_count), na.rm = T)
+  # calculate average in all directions
+  fcell_count <-  func(c(up_count, down_count, left_count, right_count), na.rm = T)
 
-    return(fcell_count)
+  return(fcell_count)
 
-  } else {
-
-    # count of cells on up/down/left/right side of cell before a 0 occurs
-    side_df <- data.frame(
-      row         = row_index,
-      col         = col_index,
-      direction   = c("up", "down", "left", "right"),
-      cell_count  = c(up_count, down_count, left_count, right_count)
-    )
-
-    # omit NAs
-    side_df <- na.omit(side_df)
-
-    # select cell count and direction columns
-    side_df <- side_df[c("cell_count", "direction")]
-
-    return(side_df)
-
-  }
+  # } else {
+  #
+  #   # count of cells on up/down/left/right side of cell before a 0 occurs
+  #   side_df <- data.frame(
+  #     row         = row_index,
+  #     col         = col_index,
+  #     direction   = c("up", "down", "left", "right"),
+  #     cell_count  = c(up_count, down_count, left_count, right_count)
+  #   )
+  #
+  #   # omit NAs
+  #   side_df <- na.omit(side_df)
+  #
+  #   # select cell count and direction columns
+  #   side_df <- side_df[c("cell_count", "direction")]
+  #
+  #   return(side_df)
+  #
+  # }
 
 }
 
