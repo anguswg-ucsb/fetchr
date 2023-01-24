@@ -1,6 +1,6 @@
 Package: fetchr
 Title: fetchr: Calculate Fetch Distances for Geospatial Data
-Version: 1.1.0.3000
+Version: 1.1.0.4000
 Authors@R: 
     person("Angus", "Watters", , "anguswatters@gmail.com", role = c("aut", "cre"))
 Description: Provides functions for fast and scalable fetch distance calculations for landwater raster or vector data. 
