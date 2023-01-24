@@ -2,7 +2,7 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles: {}
-last_built: 2023-01-24T13:55Z
+last_built: 2023-01-24T14:30Z
 urls:
   reference: https://anguswg-ucsb.github.io/fetchr/reference
   article: https://anguswg-ucsb.github.io/fetchr/articles
