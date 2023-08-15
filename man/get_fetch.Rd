@@ -10,7 +10,7 @@ get_fetch(
   res = 2000,
   water_value = NA,
   func = "mean",
-  ncores = 2,
+  in_parallel = TRUE,
   verbose = TRUE
 )
 }
@@ -25,7 +25,7 @@ get_fetch(
 
 \item{func}{character R function to apply to distances from each cell. Either mean, min, max, or sum.}
 
-\item{ncores}{numeric indicating how many cores to use during parallel processing. Default is 2.}
+\item{in_parallel}{logical whether calculations should be done using parallel workers. If TRUE, (default), processes are run in parallel.}
 
 \item{verbose}{logical, whether messages should be printed. Default is FALSE, no messages print.}
 }
@@ -73,9 +73,9 @@ plot(fetch_poly)
 
 # increase the maximum distance to calculate fetch lengths out to 200km
 increase_max_dist <- fetchr::get_fetch(
-r        = fetchr::landwater,
-max_dist = 200000,
-ncores   = 4                      # increase the number of cores used on computer
+r           = fetchr::landwater,
+max_dist    = 200000,
+in_parallel = TRUE                 # Run in parallel
 )
 
 # plot mean fetch going out 200km
