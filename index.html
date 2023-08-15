@@ -74,7 +74,7 @@
 <a href="https://en.wikipedia.org/wiki/Wind_fetch" class="external-link"><strong>« Fetch »</strong></a> <br></p>
 </div>
 <hr>
-<p>The goal of <strong><code>fetchr</code></strong> is to provide a fast and efficient raster based method for calculating fetch lengths across thousands of water grid cells. Calculating fetch lengths, the distance that wind can blow in a constant direction over a body of water without interruption, can be a slow and memory intensive process when done on thousands of points of interest in multiple directions. <strong><code>fetchr</code></strong> attempts to fix this problem and allows for thousands of fetch calculations to be performed in a fraction of the time that other methods take.</p>
+<p>The goal of <code>fetchr</code> is to provide a fast and efficient raster based method for calculating fetch lengths across thousands of water grid cells. Calculating fetch lengths, the distance that wind can blow in a constant direction over a body of water without interruption, can be a slow and memory intensive process when done on thousands of points of interest in multiple directions. <code>fetchr</code> attempts to fix this problem and allows for thousands of fetch calculations to be performed in a fraction of the time that other methods take.</p>
 <hr>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -113,7 +113,7 @@
 <span></span>
 <span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">landwater</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#2e8b57"</span>, <span class="st">"#add8e6"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-binary_lw-1.png" width="100%"></p>
-<p>This raster now meets all the specification for using <strong><code><a href="reference/get_fetch.html">get_fetch()</a></code></strong>:</p>
+<p>This raster now meets all the specification for using <code><a href="reference/get_fetch.html">get_fetch()</a></code>:</p>
 <ul>
 <li>Binary cell values (land cells = 0 and water cells = 1)</li>
 <li>Projected Coordinate Reference System</li>
@@ -124,27 +124,42 @@
 <div class="section level2">
 <h2 id="calculate-fetch-length">Calculate fetch length<a class="anchor" aria-label="anchor" href="#calculate-fetch-length"></a>
 </h2>
-<p>Internally, <strong><code><a href="reference/get_fetch.html">get_fetch()</a></code></strong> will coerce polygon/multipolygon geometries and rasters into the required binary landwater raster. It is recommended to provide either an <code>sf</code>/<code>terra</code> polygon or a <code>raster</code>/<code>terra</code> raster with a single value for land cells and NA values for water cells. To calculate fetch distances, we can simply provide an <code>sf</code>/<code>terra</code> polygon or <code>raster</code>/<code>terra</code> raster to <strong><code><a href="reference/get_fetch.html">get_fetch()</a></code></strong>,</p>
+<p>Internally, <code><a href="reference/get_fetch.html">get_fetch()</a></code> will coerce polygon/multipolygon geometries and rasters into the required binary landwater raster. It is recommended to provide either an <code>sf</code>/<code>terra</code> polygon or a <code>raster</code>/<code>terra</code> raster with a single value for land cells and NA values for water cells. To calculate fetch distances, we can simply provide an <code>sf</code>/<code>terra</code> polygon or <code>raster</code>/<code>terra</code> raster to <code><a href="reference/get_fetch.html">get_fetch()</a></code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  </span>
 <span>  <span class="va">fetch</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu"><a href="reference/get_fetch.html">get_fetch</a></span><span class="op">(</span></span>
-<span>    r        <span class="op">=</span> <span class="va">land_rast</span>,     <span class="co"># binary land water raster</span></span>
-<span>    max_dist <span class="op">=</span> <span class="fl">200000</span>,        <span class="co"># maximum distance to calculate fetch in meters (200km)</span></span>
-<span>    ncores   <span class="op">=</span> <span class="fl">12</span>,            <span class="co"># number of computer cores to use </span></span>
-<span>    verbose  <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    r           <span class="op">=</span> <span class="va">land_rast</span>,     <span class="co"># binary land water raster</span></span>
+<span>    max_dist    <span class="op">=</span> <span class="fl">200000</span>,        <span class="co"># maximum distance to calculate fetch in meters (200km)</span></span>
+<span>    in_parallel <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># run calculations in parallel</span></span>
+<span>    verbose     <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>    <span class="op">)</span></span>
 <span>  </span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Calculating Fetch...</span></span>
-<span><span class="co">#&gt; Calculating north/south/east/west distances</span></span>
-<span><span class="co">#&gt; Calculating diagonal distances</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;    5.20    0.33   12.19</span></span>
+<span><span class="co">#&gt;   0.037   0.012  12.351</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fetch</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-fetch_calc-1.png" width="100%"></p>
-<p><strong>In this example here, calculating fetch distances for &gt; 24,000 water cells took about ~12 seconds, or ~0.00083 seconds per point. That is a ~ 99.92% reduction in computation time compared to various other polygon based methods out there!</strong></p>
+<p>In this example here, my machine calculated fetch distances for &gt; 24,000 water cells in about ~3 seconds, or ~0.00014 seconds per point. That is a ~99.99% reduction in computation time compared to various other polygon based methods out there!</p>
+<p><br></p>
+</div>
+<div class="section level2">
+<h2 id="multidirectional-fetch-calculations">Multidirectional fetch calculations<a class="anchor" aria-label="anchor" href="#multidirectional-fetch-calculations"></a>
+</h2>
+<p>The <code><a href="reference/get_fetch_directions.html">get_fetch_directions()</a></code> function allows you to get get individual fetch distances in 8 directions:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">multi_fetch</span> <span class="op">&lt;-</span> <span class="fu">fetchr</span><span class="fu">::</span><span class="fu"><a href="reference/get_fetch_directions.html">get_fetch_directions</a></span><span class="op">(</span></span>
+<span>  r           <span class="op">=</span> <span class="va">land_rast</span>,     <span class="co"># binary land water raster</span></span>
+<span>  max_dist    <span class="op">=</span> <span class="fl">200000</span>,        <span class="co"># maximum distance to calculate fetch in meters (200km)</span></span>
+<span>  in_parallel <span class="op">=</span> <span class="cn">TRUE</span>,          <span class="co"># run calculations in parallel</span></span>
+<span>  verbose     <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; Calculating Fetch...</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">multi_fetch</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-multi_fetch_calc-1.png" width="100%"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -181,7 +196,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="#"><img src="https://img.shields.io/badge/dependencies-9/07-orange?style=flat" alt="Dependencies"></a></li>
+<li><a href="#"><img src="https://img.shields.io/badge/dependencies-8/07-orange?style=flat" alt="Dependencies"></a></li>
 <li><a href="https://choosealicense.com/licenses/mit/" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
 </ul>
 </div>
