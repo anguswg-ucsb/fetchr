@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![Dependencies](https://img.shields.io/badge/dependencies-9/07-orange?style=flat)](#)
+[![Dependencies](https://img.shields.io/badge/dependencies-8/07-orange?style=flat)](#)
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://choosealicense.com/licenses/mit/)
 <!-- badges: end -->
@@ -21,14 +21,14 @@ MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://choosealicens
 
 <hr>
 
-The goal of **`fetchr`** is to provide a fast and efficient raster based
+The goal of `fetchr` is to provide a fast and efficient raster based
 method for calculating fetch lengths across thousands of water grid
 cells. Calculating fetch lengths, the distance that wind can blow in a
 constant direction over a body of water without interruption, can be a
 slow and memory intensive process when done on thousands of points of
-interest in multiple directions. **`fetchr`** attempts to fix this
-problem and allows for thousands of fetch calculations to be performed
-in a fraction of the time that other methods take.
+interest in multiple directions. `fetchr` attempts to fix this problem
+and allows for thousands of fetch calculations to be performed in a
+fraction of the time that other methods take.
 
 <hr>
 
@@ -79,46 +79,65 @@ terra::plot(landwater, col = c("#2e8b57", "#add8e6"))
 
 <img src="man/figures/README-binary_lw-1.png" width="100%" />
 
-This raster now meets all the specification for using **`get_fetch()`**:
+This raster now meets all the specification for using `get_fetch()`:
 
--   Binary cell values (land cells = 0 and water cells = 1)
--   Projected Coordinate Reference System
--   Regular grid cell size (same x and y cell resolution)
+- Binary cell values (land cells = 0 and water cells = 1)
+- Projected Coordinate Reference System
+- Regular grid cell size (same x and y cell resolution)
 
 <br>
 
 ## Calculate fetch length
 
-Internally, **`get_fetch()`** will coerce polygon/multipolygon
-geometries and rasters into the required binary landwater raster. It is
-recommended to provide either an `sf`/`terra` polygon or a
-`raster`/`terra` raster with a single value for land cells and NA values
-for water cells. To calculate fetch distances, we can simply provide an
-`sf`/`terra` polygon or `raster`/`terra` raster to **`get_fetch()`**,
+Internally, `get_fetch()` will coerce polygon/multipolygon geometries
+and rasters into the required binary landwater raster. It is recommended
+to provide either an `sf`/`terra` polygon or a `raster`/`terra` raster
+with a single value for land cells and NA values for water cells. To
+calculate fetch distances, we can simply provide an `sf`/`terra` polygon
+or `raster`/`terra` raster to `get_fetch()`
 
 ``` r
 system.time(
   
   fetch <- fetchr::get_fetch(
-    r        = land_rast,     # binary land water raster
-    max_dist = 200000,        # maximum distance to calculate fetch in meters (200km)
-    ncores   = 12,            # number of computer cores to use 
-    verbose  = TRUE
+    r           = land_rast,     # binary land water raster
+    max_dist    = 200000,        # maximum distance to calculate fetch in meters (200km)
+    in_parallel = TRUE,          # run calculations in parallel
+    verbose     = TRUE
     )
   
 )
 #> Calculating Fetch...
-#> Calculating north/south/east/west distances
-#> Calculating diagonal distances
 #>    user  system elapsed 
-#>    5.20    0.33   12.19
+#>   0.037   0.012  12.351
 
 plot(fetch)
 ```
 
 <img src="man/figures/README-fetch_calc-1.png" width="100%" />
 
-**In this example here, calculating fetch distances for \> 24,000 water
-cells took about \~12 seconds, or \~0.00083 seconds per point. That is a
-\~ 99.92% reduction in computation time compared to various other
-polygon based methods out there!**
+In this example here, my machine calculated fetch distances for \>
+24,000 water cells in about ~3 seconds, or ~0.00014 seconds per point.
+That is a ~99.99% reduction in computation time compared to various
+other polygon based methods out there!
+
+<br>
+
+## Multidirectional fetch calculations
+
+The `get_fetch_directions()` function allows you to get get individual
+fetch distances in 8 directions:
+
+``` r
+multi_fetch <- fetchr::get_fetch_directions(
+  r           = land_rast,     # binary land water raster
+  max_dist    = 200000,        # maximum distance to calculate fetch in meters (200km)
+  in_parallel = TRUE,          # run calculations in parallel
+  verbose     = TRUE
+  )
+#> Calculating Fetch...
+
+plot(multi_fetch)
+```
+
+<img src="man/figures/README-multi_fetch_calc-1.png" width="100%" />
