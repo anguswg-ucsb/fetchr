@@ -16,7 +16,13 @@
     <loc>https://anguswg-ucsb.github.io/fetchr/index.html</loc>
   </url>
   <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://anguswg-ucsb.github.io/fetchr/reference/get_fetch.html</loc>
+  </url>
+  <url>
+    <loc>https://anguswg-ucsb.github.io/fetchr/reference/get_fetch_directions.html</loc>
   </url>
   <url>
     <loc>https://anguswg-ucsb.github.io/fetchr/reference/get_landwater.html</loc>
