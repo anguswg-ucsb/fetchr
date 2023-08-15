@@ -74,7 +74,7 @@ landwater <- fetchr::get_landwater(
 terra::plot(landwater, col = c("#2e8b57", "#add8e6"))
 ```
 
-This raster now meets all the specification for using **`get_fetch()`**:
+This raster now meets all the specification for using `get_fetch()`:
 
   - Binary cell values (land cells = 0 and water cells = 1)
   - Projected Coordinate Reference System
@@ -83,15 +83,15 @@ This raster now meets all the specification for using **`get_fetch()`**:
 <br>
 
 ## Calculate fetch length
-Internally, **`get_fetch()`** will coerce polygon/multipolygon geometries and rasters into the required binary landwater raster. It is recommended to provide either an `sf`/`terra` polygon or a `raster`/`terra` raster with a single value for land cells and NA values for water cells. To calculate fetch distances, we can simply provide an `sf`/`terra` polygon or `raster`/`terra` raster to **`get_fetch()`**,   
+Internally, `get_fetch()` will coerce polygon/multipolygon geometries and rasters into the required binary landwater raster. It is recommended to provide either an `sf`/`terra` polygon or a `raster`/`terra` raster with a single value for land cells and NA values for water cells. To calculate fetch distances, we can simply provide an `sf`/`terra` polygon or `raster`/`terra` raster to `get_fetch()`,   
 ```{r fetch_calc}
 system.time(
   
   fetch <- fetchr::get_fetch(
-    r        = land_rast,     # binary land water raster
-    max_dist = 200000,        # maximum distance to calculate fetch in meters (200km)
-    ncores   = 12,            # number of computer cores to use 
-    verbose  = TRUE
+    r           = land_rast,     # binary land water raster
+    max_dist    = 200000,        # maximum distance to calculate fetch in meters (200km)
+    in_parallel = TRUE,          # run calculations in parallel
+    verbose     = TRUE
     )
   
 )
@@ -99,7 +99,7 @@ system.time(
 plot(fetch)
 ```
 
-**In this example here, calculating fetch distances for > 24,000 water cells took about ~12 seconds, or ~0.00083 seconds per point. That is a  ~ 99.92% reduction in computation time compared to various other polygon based methods out there!**
+**In this example here, my machine calculated fetch distances for > 24,000 water cells in about ~2 seconds, or ~0.00010 seconds per point. That is a  ~99.99% reduction in computation time compared to various other polygon based methods out there!**
 
 
 

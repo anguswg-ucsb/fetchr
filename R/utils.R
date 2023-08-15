@@ -1,5 +1,614 @@
 utils::globalVariables(c(".", "res", "cell_count", "diag_cell_count", "side_cell_count"))
 
+#' Get the primary and secondary diagonals for a cell in a matrix
+#'
+#' @param grid matrix
+#' @param row numeric, row number
+#' @param col numeric, column number
+#' @param NROW numeric, number of rows in `grid`
+#' @param NCOL numeric, number of columns in `grid`
+#' @noRd
+#' @keywords internal
+#' @return list of length 2, containing the numeric vector of values for the primary and secondary diagonals and the index of the given cell within that numeric vector
+get_diag_vectors <- function(grid,
+                             row,
+                             col,
+                             NROW = NULL,
+                             NCOL = NULL) {
+  # grid = rmat
+  # row  =   idx$row[i]
+  # col  =   idx$col[i]
+  # search_value = 0
+  # max_count = max_count
+  # matrix_size <- 6
+  # initial_matrix <- matrix(1, nrow = matrix_size, ncol = matrix_size)
+  # grid <- initial_matrix
+  # row = 4
+  # col = 5
+  # # island2_rows <- c(7, 7, 7)
+  # # island2_cols <- c(7, 8, 9)
+
+  # # initial_matrix[island2_rows, island2_cols] <- 0
+
+  # calculate the distances to the edges
+  left_dist <- min(row - 1, col - 1)
+  right_dist <- min(NCOL - col, NROW - row)
+
+  # top left corner coordinates of diagonal
+  topleft_row <- row - left_dist
+  topleft_col <- col - left_dist
+
+  # bottom right corner coordinates of diagonal
+  bottomright_row <- row + right_dist
+  bottomright_col <- col + right_dist
+
+  # calculate the distances to the edges for top right to bottom left diagonal
+  topright_dist <- min(row - 1, NCOL - col)
+  bottomleft_dist <- min(NROW - row, col - 1)
+
+  # top right corner coordinates of diagonal
+  topright_row <- row - topright_dist
+  topright_col <- col + topright_dist
+
+  # bottom left corner coordinates of diagonal
+  bottomleft_row <- row + bottomleft_dist
+  bottomleft_col <- col - bottomleft_dist
+
+  # coordinates of primary diagonal
+  prim_diag_coords <- cbind(
+    seq(topleft_row, bottomright_row, by = 1),
+    seq(topleft_col, bottomright_col, by = 1)
+  )
+
+  # index of starting point in primary diagonal
+  prim_index <- which(prim_diag_coords[, 1] == row)
+
+  # coordinates of secondary diagonal
+  sec_diag_coords <- cbind(
+    seq(bottomleft_row, topright_row, by = -1), # Going from bottomleft row to topright row
+    seq(bottomleft_col, topright_col, by = 1) # Going from bottomleft COL to topright COL
+    # rev(seq(topright_row, bottomleft_row, by = 1)),  # LATEST WORKING Top Right row to bottom left row then reverse
+    # rev(seq(topright_col, bottomleft_col, by = -1))  # LATEST WORKING Top Right COL to bottom left COL then reverse
+    # seq(topright_row, bottomleft_row, by = 1),  #  NO REVERSE
+    # seq(topright_col, bottomleft_col, by = -1)  #  NO REVERSE
+  )
+
+  # index of starting point in secondary diagonal
+  sec_index <- which(sec_diag_coords[, 1] == row)
+
+  # primary diagonal (top left to bottom right)
+  primary <- grid[prim_diag_coords]
+
+  # secondary diagonal (top right to bottom left)
+  secondary <- grid[sec_diag_coords]
+
+  # mmm <- print_diags(
+  #   x = grid,
+  #   origin_row = row,
+  #   origin_col = col,
+  #   TL_row= topleft_row,
+  #   TL_col =topleft_col,
+  #   BR_row = bottomright_row,
+  #   BR_col= bottomright_col,
+  #   BL_row = bottomleft_row,
+  #   BL_col = bottomleft_col,
+  #   TR_row = topright_row,
+  #   TR_col = topright_col
+  #   )
+  # plot(terra::rast(mmm))
+
+  return(
+    list(
+      primary   = list(index = prim_index, diag = primary),
+      secondary = list(index = sec_index, diag = secondary)
+    )
+  )
+
+}
+
+#' Get the distance from a cell to a specific search value in 8 directions
+#' Internal function used to get distances in all directions from a given cell (row, column)
+#' @param grid matrix, numerics or integers
+#' @param row numeric, row numbers
+#' @param col, numeric, column number
+#' @param search_value numeric, value to search for. Default is 0
+#' @param max_count numeric, maximum number of cells to count outwards
+#' @noRd
+#' @keywords internal
+#' @return a numeric vector of length 8, containing the distance from the given cell to search_value in each of the 8 directions
+get_cell_distances <- function(grid, row, col, search_value, max_count) {
+
+  # grid dimensions
+  NROW = nrow(grid)
+  NCOL = ncol(grid)
+
+  # get diagonal vectors for given row, col
+  diag_vectors <- get_diag_vectors(
+    grid         = grid,
+    row          = row,
+    col          = col,
+    NROW         = NROW,
+    NCOL         = NCOL
+  )
+
+  # # create vector of cell distances
+  cell_distances <- as.integer(
+    c(
+      get_vector_distances(
+        vect         = as.integer(grid[row, ]),
+        start_index  = col,
+        search_value = search_value,
+        max_count    = max_count
+      ),
+      get_vector_distances(
+        vect         = as.integer(grid[,col]),
+        start_index  = row,
+        search_value = search_value,
+        max_count    = max_count
+      ),
+      get_vector_distances(
+        vect         = as.integer(diag_vectors[['primary']][['diag']]),
+        start_index =  as.integer(diag_vectors[['primary']][['index']]),
+        search_value = search_value,
+        max_count    = max_count
+      ),
+      get_vector_distances(
+        vect         = as.integer(diag_vectors[['secondary']][['diag']]),
+        start_index =  as.integer(diag_vectors[['secondary']][['index']]),
+        search_value = search_value,
+        max_count    = max_count
+      )
+    )
+  )
+
+  return(cell_distances)
+
+}
+
+#' Run get_direction_distances, either in parallel or not
+#'
+#' @param grid matrix
+#' @param index_df dataframe
+#' @param max_count numeric
+#' @param func character indicating the function to apply to each set of distances. Either "mean", "min", "max", or "sum"
+#' @param in_parallel logical, whether function should in parallel or not
+#' @noRd
+#' @keywords internal
+#' @return list of summarized distance values for each row in index_df
+do_cell_distances <- function(grid, index_df, max_count, func, in_parallel) {
+
+  # match function to R function
+  func <- match.fun(func)
+
+  # if in_parallel is TRUE, run function in parallel
+  if(in_parallel) {
+
+    # initiate parallel clusters
+    clust <- parallel::makeCluster(parallel::detectCores()-1)
+
+    # export variables to clusters and load packages
+    parallel::clusterExport(clust, c('get_cell_distances', 'grid', 'index_df', 'max_count', 'get_diag_vectors', 'func',
+                                     'get_vector_distances'),
+                            envir=environment())
+    # system.time({
+
+    # side counts/lengths directions
+    dists <- parallel::parLapply(
+      cl = clust,
+      1:nrow(index_df), function(i) {
+
+        func(
+          get_cell_distances(
+            grid = grid,
+            row  =   index_df$row[i],
+            col  =   index_df$col[i],
+            search_value = 0,
+            max_count = max_count
+          ),
+          na.rm = TRUE
+        )
+
+      })
+    # })
+
+    # stop parallel processing clusters
+    parallel::stopCluster(clust)
+
+  } else {
+
+    # system.time({
+    # get average distance for each cell in matrix
+    dists <- lapply(1:nrow(index_df), function(i) {
+      # i = 900
+      # i = 335
+
+      func(
+        get_cell_distances(
+          grid = grid,
+          row  =   index_df$row[i],
+          col  =   index_df$col[i],
+          search_value = 0,
+          max_count = max_count
+        ),
+        na.rm = TRUE
+      )
+
+    })
+    # })
+  }
+
+  return(dists)
+
+}
+
+#' Get the distances in 8 directions from a cell to a specified search value
+#' For internal use and calculations for get_fetch_directions
+#' @param grid matrix
+#' @param row numeric, row number to get directions for
+#' @param col numeric, column number to get directions for
+#' @param search_value numeric, value to search for in each direction
+#' @param max_count numeric, maximum number of cells to count outwards
+#' @noRd
+#' @keywords internal
+#' @return list of length 8 containing the distances to search_value
+get_direction_distances <- function(grid, row, col, search_value, max_count) {
+
+  # grid = rmat
+  # row  =   idx$row[i]
+  # col  =   idx$col[i]
+  # search_value = 0
+  # max_count = max_count
+
+  NROW = nrow(grid)
+  NCOL = ncol(grid)
+
+  # get diagonal vectors for given row, col
+  diag_vectors <- get_diag_vectors(
+    grid         = grid,
+    row          = row,
+    col          = col,
+    NROW         = NROW,
+    NCOL         = NCOL
+  )
+
+  row_distances <- get_vector_distances(
+    vect         = as.integer(grid[row, ]),
+    start_index  = col,
+    search_value = search_value,
+    max_count    = max_count
+  )
+
+  col_distances <- get_vector_distances(
+    vect         = as.integer(grid[,col]),
+    start_index  = row,
+    search_value = search_value,
+    max_count    = max_count
+  )
+
+  diag_top_distances <- get_vector_distances(
+    vect         = as.integer(diag_vectors[['primary']][['diag']]),
+    start_index  =  as.integer(diag_vectors[['primary']][['index']]),
+    search_value = search_value,
+    max_count    = max_count
+  )
+
+  # col
+  # diag_vectors$secondary[col]
+  # length(diag_vectors$secondary)
+  # min(row, col)
+  diag_bottom_distances <- get_vector_distances(
+    vect         = as.integer(diag_vectors[['secondary']][['diag']]),
+    start_index =  as.integer(diag_vectors[['secondary']][['index']]),
+    # vect         = as.integer(diag_vectors$secondary),
+    # start_index  = col,
+    # start_index  = ifelse(
+    #   above_secondary_diag(row, col, NCOL),
+    #   col,
+    #   row
+    #   # row + 1
+    #   # (length(as.integer(diag_vectors$secondary)) - col) + 1
+    # ),
+    # start_index  = length(as.integer(diag_vectors$secondary)) - (row - 1),
+    search_value = search_value,
+    max_count    = max_count
+  )
+
+  # distances in each of the 8 directions
+  west <- row_distances[1]
+  east <- row_distances[2]
+
+  north <- col_distances[1]
+  south <- col_distances[2]
+
+  northwest <- diag_top_distances[1]
+  southeast <- diag_top_distances[2]
+
+  northeast <- diag_bottom_distances[1]
+  southwest <- diag_bottom_distances[2]
+
+  return(
+    list(
+      east      = east,
+      southeast = southeast,
+      south     = south,
+      southwest = southwest,
+      west      = west,
+      northwest = northwest,
+      north     = north,
+      northeast = northeast
+    )
+  )
+
+}
+
+#' Run get_direction_distances, either in parallel or not
+#'
+#' @param grid matrix
+#' @param index_df dataframe
+#' @param max_count numeric
+#' @param in_parallel logical, whether function should in parallel or not
+#' @noRd
+#' @keywords internal
+#' @return list of direction distances for each row index_df
+do_dir_distances <- function(grid, index_df, max_count, in_parallel) {
+
+  if(in_parallel) {
+
+    # initiate parallel clusters
+    clust <- parallel::makeCluster(  parallel::detectCores()-1)
+
+    # export variables to clusters and load packages
+    parallel::clusterExport(clust, c('get_direction_distances', 'grid', 'index_df', 'max_count', 'get_diag_vectors',
+                                     'get_vector_distances'),
+                            envir=environment())
+    # system.time({
+
+    # side counts/lengths directions
+    dists <- parallel::parLapply(
+      cl = clust,
+      1:nrow(index_df), function(i) {
+
+        get_direction_distances(
+          grid = grid,
+          row  =   index_df$row[i],
+          col  =   index_df$col[i],
+          search_value = 0,
+          max_count = max_count
+        )
+
+      })
+    # })
+
+    # stop parallel processing clusters
+    parallel::stopCluster(clust)
+
+  } else {
+
+    # system.time({
+    # get average distance for each cell in matrix
+    dists <- lapply(1:nrow(index_df), function(i) {
+      # i = 900
+      # i = 335
+
+      get_direction_distances(
+        grid = grid,
+        row  =   index_df$row[i],
+        col  =   index_df$col[i],
+        search_value = 0,
+        max_count = max_count
+      )
+
+    })
+    # })
+  }
+
+  return(dists)
+
+}
+
+#' Find the distance from a given index to the nearest search_value to the left and right of the given index
+#' Internal function used for finding distances to the left and right of a given cell in a matrix. This function works by taking a vector,
+#' which ends up being the row/column/diagonal values from a given cell, and returns the distance left and right of the cell before the given search_value is found
+#'
+#' @param vect numeric vector
+#' @param start_index numeric, index to start search from
+#' @param search_value numeric, value to the left and/or right of the given index to find distances too
+#' @param max_count numeric, maximum distance. if no search_value is found or the value is greater than max_count, then max_count is given as the distance
+#' @noRd
+#' @keywords internal
+#' @return numeric vector of length 2,the distance to the left and right of the index, respectively
+get_vector_distances <- function(vect, start_index, search_value, max_count) {
+  # vect <- row_vector
+  # start_index <- col
+  # search_value <- 0
+
+  # where are the first indices with the search_value
+  cell_stops <- which(vect == search_value)
+
+  # length(which(vect == search_value)) == 0
+  # vect == search_value
+
+  # if there are none of the search values in the vector, return a list with the left and right counts as the max_count
+  if (!any(vect == search_value)) {
+    # if(length(which(vect == search_value)) == 0) {
+
+    return(
+      c(max_count, max_count)
+    )
+
+  }
+
+  # indices of search values (cells that equalled the search_value) that are to the LEFT of the start_index
+  # left_search <- cell_stops[cell_stops <= (start_index + 1)]
+  left_search <- cell_stops[cell_stops < start_index]
+
+  # if there are zero indices to the left of the start index, set left to max_count
+  if(length(left_search) == 0) {
+
+    # set left to max_count allowed
+    left = max_count
+
+  } else {
+
+    # distance to first search value is the current index minus the biggest index in the values found by running which(==search_values)
+    left = start_index - left_search[length(left_search)]
+    # left = start_index - max(left_search)
+
+    # if left value is greater than the max_count, set left to the max count, otherwise leave it alone
+    left <- ifelse(left > max_count, max_count, left)
+
+  }
+
+  # # if left value is greater than the max_count, set left to the max count, otherwise leave it alone
+  # left <- ifelse(left > max_count, max_count, left)
+
+  # indices of search values that are to the right of the start_index
+  right_search <- cell_stops[cell_stops > start_index]
+
+  # if there are zero indices to the RIGHT of the start index, set RIGHT to max_count
+  if(length(right_search) == 0) {
+
+    # set right to max_count allowed
+    right = max_count
+
+  } else {
+    # distance to first search value is the smallest index in search_values minus current index gives the distance to the nearest search_value in the RIGHT DIRECTION
+    right = right_search[1] - start_index
+    # right = min(right_search)- start_index
+
+    # if right value is greater than the max_count, set right to the max count, otherwise leave it alone
+    right <- ifelse(right > max_count, max_count, right)
+
+  }
+
+  # # if right value is greater than the max_count, set right to the max count, otherwise leave it alone
+  # right <- ifelse(right > max_count, max_count, right)
+  # list(
+  #   left  = left,
+  #   right = right
+  # )
+
+  return(c(left, right))
+  # list(
+  #   left  = left,
+  #   right = right
+  # )
+  # )
+}
+
+#' Check which half of a matrix a row, column is in along the primary diagonal
+#' If you cut a matrix along the secondary diagonal (top left corner to bottom right corner),
+#' this condition will check if a row, column is in the top right half or bottom left half of the matrix.
+#' @param row numeric, row number
+#' @param col numeric, column number
+#' @noRd
+#' @keywords internal
+#' @return logical, TRUE if above the primary diagonal (top right half), otherwise FALSE (bottom left half)
+above_priamary_diag <- function(row, col) {
+  # If you cut a matrix along the secondary diagonal (top left corner to bottom right corner),
+  # this condition will check if a row, column is in the top right half or bottom left half of the matrix.
+
+  # if row is less than or equal to the column, we are in the top right half of matrix
+  if (row <= col) {
+
+    return(TRUE)
+
+    # otherwise we are in the bottom left half
+  } else {
+
+    return(FALSE)
+
+  }
+}
+
+#' Check which half of a matrix a row, column is in along the secondary diagonal
+#' If you cut a matrix along the secondary diagonal (bottom left corner to top right corner),
+#' this condition will check if a row, column is in the top left half or bottom right half of the matrix.
+#' @param row numeric, row number
+#' @param col numeric, column number
+#' @param NCOL numeric, number of columns in matrix
+#' @noRd
+#' @keywords internal
+#' @return logical, TRUE if above the secondary diagonal (top left half), otherwise FALSE (bottom right half)
+above_secondary_diag <- function(row, col, NCOL) {
+  # if you cut a matrix along the secondary diagonal (bottom left corner to top right corner),
+  # this condition will check if a row, column is in the top left half or bottom right half of the matrix
+
+  # if row + col is less than or equal to the number of columns in the matrix, we are in the top left half
+  if(row + col <= NCOL) {
+
+    return(TRUE)
+
+    # otherwise we are in the bottom right half
+  } else {
+
+    return(FALSE)
+
+  }
+}
+
+#' Create a new matrix with diagonal lines from a cell highlighted/changed
+#' Provide the top left, top right, bottom left, and bottom right row and columns representing the diagonals from a given cell and create a new matrix with replaced values.
+#'  For internal use.
+#'
+#' @param x matrix
+#' @param origin_row numeric, original row
+#' @param origin_col numeric, original column
+#' @param TL_row numeric
+#' @param TL_col numeric
+#' @param BR_row numeric
+#' @param BR_col numeric
+#' @param BL_row numeric
+#' @param BL_col numeric
+#' @param TR_row numeric
+#' @param TR_col numeric
+#' @noRd
+#' @keywords internal
+#' @return numeric matrix
+print_diags <- function(x, origin_row, origin_col,
+                        TL_row, TL_col, BR_row, BR_col,
+                        BL_row, BL_col, TR_row, TR_col) {
+  # x <- grid
+  # origin_row = row
+  # origin_col = col
+  # TL_row= topleft_row
+  # TL_col =topleft_col
+  # BR_row = bottomright_row
+  # BR_col= bottomright_col
+  # BL_row = bottomleft_row
+  # BL_col = bottomleft_col
+  # TR_row = topright_row
+  # TR_col = topright_col
+
+  # set primary axis
+  x[
+    cbind(
+      seq(TL_row, BR_row, by = 1),
+      seq(TL_col, BR_col, by = 1)
+    )
+  ]  <- 2
+
+  # set secondary axis
+  x[
+    cbind(
+      # rev(seq(topright_row, bottomleft_row, by = 1)),
+      # seq(bottomleft_col, topright_col, by = 1)
+      rev(seq(TR_row, BL_row, by = 1)),  # Increasing row indices
+      rev(seq(TR_col, BL_col, by = -1))  # Decreasing column indices
+      # seq(topright_row, bottomleft_row, by = 1),
+      # seq(topright_col, bottomleft_col, by = -1)
+      # seq(topright_row, bottomleft_row, by = 1),
+      # seq(topright_col, bottomleft_col, by = -1)
+    )
+  ] <- 2
+
+  x[origin_row, origin_col] <- 9999
+
+  return(x)
+
+}
+
+
 #' Retrieve length of any diagonal direction for a specific matrix cell
 #' @description Given a matrix and the row and column number for the cell of interest, return the number of consecutive non-zero values
 #' @param m matrix of interest
